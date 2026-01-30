@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: portfolio-client
-        image: crymall/portfolio-client:v1
+        image: crymall/portfolio-client:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 80
