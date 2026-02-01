@@ -4,7 +4,12 @@ import useData from "../context/data/useData";
 import Can from "./Can";
 
 const UserList = () => {
-  const { users, roles, usersLoading, deleteUser, updateUserRole } = useData();
+  const { users, usersLoading, deleteUser, updateUserRole } = useData();
+  const roleOptions = [
+    { value: "Admin", label: "Admin" },
+    { value: "Editor", label: "Editor" },
+    { value: "Viewer", label: "Viewer" },
+  ];
 
   if (usersLoading) {
     return (
@@ -23,9 +28,6 @@ const UserList = () => {
   }
 
   const rows = users.map((user) => {
-    const roleObj = roles.find((r) => r.name === user.role);
-    const roleValue = roleObj ? String(roleObj.id) : null;
-
     return (
       <Table.Tr key={user.id}>
         <Table.Td>{user.id}</Table.Td>
@@ -48,8 +50,8 @@ const UserList = () => {
             }
           >
             <Select
-              data={roles.map((r) => ({ value: String(r.id), label: r.name }))}
-              value={roleValue}
+              data={roleOptions}
+              value={user.role}
               onChange={(val) => updateUserRole(user.id, val)}
               allowDeselect={false}
             />
