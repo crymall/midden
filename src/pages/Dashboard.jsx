@@ -53,7 +53,7 @@ const Dashboard = () => {
       <AppShell.Main>
         <Container size="xl">
           <Tabs defaultValue="admin">
-            <Tabs.List mb="md">
+            <Tabs.List>
               <Can perform="read:users">
                 <Tabs.Tab value="admin" color="red">
                   Admin Panel

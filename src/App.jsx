@@ -1,4 +1,6 @@
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { MantineProvider } from "@mantine/core";
+import { win95Theme } from "./theme";
 import AuthProvider from "./context/auth/AuthProvider";
 import DataProvider from "./context/data/DataProvider";
 import Login from "./pages/Login";
@@ -8,6 +10,7 @@ import RequireAuth from "./components/RequireAuth";
 function App() {
   return (
     <BrowserRouter>
+      <MantineProvider theme={win95Theme}>
       <AuthProvider>
         <DataProvider>
           <div className="app-container">
@@ -23,6 +26,7 @@ function App() {
           </div>
         </DataProvider>
       </AuthProvider>
+      </MantineProvider>
     </BrowserRouter>
   );
 }
