@@ -9,6 +9,10 @@ import {
   ActionIcon,
   Title,
   Text,
+  TextInput,
+  PasswordInput,
+  Paper,
+  Alert,
 } from "@mantine/core";
 
 export const win95Theme = createTheme({
@@ -164,6 +168,57 @@ export const win95Theme = createTheme({
       styles: {
         root: {
           fontFamily: '"MS Sans Serif", Arial, sans-serif',
+        },
+      },
+    }),
+    TextInput: TextInput.extend({
+      defaultProps: { radius: 0 },
+      styles: {
+        input: {
+          backgroundColor: "white",
+          borderTop: "2px solid #808080",
+          borderLeft: "2px solid #808080",
+          borderRight: "2px solid #fff",
+          borderBottom: "2px solid #fff",
+          color: "black",
+        },
+      },
+    }),
+    PasswordInput: PasswordInput.extend({
+      defaultProps: { radius: 0 },
+      styles: {
+        input: {
+          backgroundColor: "white",
+          borderTop: "2px solid #808080",
+          borderLeft: "2px solid #808080",
+          borderRight: "2px solid #fff",
+          borderBottom: "2px solid #fff",
+          color: "black",
+        },
+      },
+    }),
+    Paper: Paper.extend({
+      defaultProps: { radius: 0, shadow: "none", withBorder: false },
+      styles: {
+        root: {
+          backgroundColor: "#c0c0c0",
+          borderTop: "2px solid #fff",
+          borderLeft: "2px solid #fff",
+          borderRight: "2px solid #000",
+          borderBottom: "2px solid #000",
+        },
+      },
+    }),
+    Alert: Alert.extend({
+      defaultProps: { radius: 0, variant: "filled" },
+      styles: {
+        root: {
+          border: "2px solid #000",
+          backgroundColor: "#c0c0c0",
+          color: "black",
+        },
+        message: {
+          color: "black",
         },
       },
     }),

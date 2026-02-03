@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import useAuth from "../context/auth/useAuth";
-import { TextInput, PasswordInput, Button, Paper, Title, Container, Group, Anchor, Text, Alert } from '@mantine/core';
+import { TextInput, PasswordInput, Button, Paper, Title, Container, Group, Anchor, Text, Alert, Box } from '@mantine/core';
 
 export default function Login() {
   // Modes: 'login', 'register', '2fa'
@@ -49,12 +49,22 @@ export default function Login() {
   };
 
   return (
-    <Container size={420} my={40}>
-      <Title align="center" sx={{ fontFamily: 'Greycliff CF, sans-serif', fontWeight: 900 }}>
-        {mode === '2fa' ? '2-Factor Verification' : mode === 'register' ? 'Create Account' : 'Welcome back!'}
-      </Title>
-      
-      <Text color="dimmed" size="sm" align="center" mt={5}>
+    <Box bg="#008080" h="100vh" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <Container size={420} p={0}>
+      <Paper p={4}>
+        <Group bg="#000080" p={2} justify="space-between" mb="md">
+          <Text c="white" fw="bold" size="sm" px={4}>
+            {mode === '2fa' ? 'Security Check' : 'User Login'}
+          </Text>
+          <Button size="xs" px={0} w={20} h={20}>X</Button>
+        </Group>
+
+        <Box p="md">
+        <Title order={3} align="center" mb="xs">
+          {mode === '2fa' ? '2-Factor Verification' : mode === 'register' ? 'Create Account' : 'Welcome back!'}
+        </Title>
+        
+        <Text size="sm" align="center" mb="lg">
         {mode === '2fa' 
           ? 'Check your backend logs for the code (simulation)' 
           : mode === 'register' 
@@ -66,10 +76,9 @@ export default function Login() {
             Create account
           </Anchor>
         )}
-      </Text>
+        </Text>
 
-      <Paper withBorder shadow="md" p={30} mt={30} radius="md">
-        {error && <Alert color="red" mb="md">{error}</Alert>}
+        {error && <Alert color="red" mb="md" title="Error">{error}</Alert>}
         {info && <Alert color="blue" mb="md">{info}</Alert>}
 
         <form onSubmit={handleSubmit}>
@@ -113,7 +122,7 @@ export default function Login() {
             </>
           )}
 
-          <Group position="apart" mt="xl">
+          <Group justify="space-between" mt="xl">
             {mode === 'register' && (
               <Anchor component="button" type="button" color="dimmed" onClick={toggleMode} size="xs">
                 Already have an account? Login
@@ -129,7 +138,9 @@ export default function Login() {
             </Button>
           </Group>
         </form>
+        </Box>
       </Paper>
     </Container>
+    </Box>
   );
 }
