@@ -1,11 +1,13 @@
 import { Table, Badge, ActionIcon, Loader, Center, Text, Select } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import useData from "../context/data/useData";
+import useAuth from "../context/auth/useAuth";
 import Can from "./Can";
 import { ROLES } from "../constants/roles";
 
 const UserList = () => {
   const { users, usersLoading, deleteUser, updateUserRole } = useData();
+  const { user: currentUser } = useAuth();
   const roleOptions = Object.entries(ROLES).map(([key, value]) => ({
     value: String(value),
     label: String(key),
@@ -28,6 +30,10 @@ const UserList = () => {
   }
 
   const rows = users.map((user) => {
+    const isCurrentUser = currentUser && currentUser.id === user.id;
+    const isAdmin = user.role === "Admin";
+    const isDisabled = isCurrentUser || isAdmin;
+
     return (
       <Table.Tr key={user.id}>
         <Table.Td>{user.id}</Table.Td>
@@ -54,6 +60,7 @@ const UserList = () => {
               value={ROLES[user.role] ? String(ROLES[user.role]) : null}
               onChange={(val) => updateUserRole(user.id, Number(val))}
               allowDeselect={false}
+              disabled={isDisabled}
             />
           </Can>
         </Table.Td>
@@ -62,6 +69,7 @@ const UserList = () => {
             <ActionIcon
               color="red"
               variant="subtle"
+              disabled={isDisabled}
               onClick={() => {
                 if (
                   confirm(`Are you sure you want to delete ${user.username}?`)
