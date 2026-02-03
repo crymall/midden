@@ -5,6 +5,8 @@ import AuthProvider from "./context/auth/AuthProvider";
 import DataProvider from "./context/data/DataProvider";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import Explorer from "./pages/Explorer";
+import Settings from "./pages/Settings";
 import RequireAuth from "./components/RequireAuth";
 
 function App() {
@@ -18,7 +20,10 @@ function App() {
               <Route path="/login" element={<Login />} />
 
               <Route element={<RequireAuth />}>
-                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/dashboard" element={<Dashboard />}>
+                  <Route index element={<Explorer />} />
+                  <Route path="settings" element={<Settings />} />
+                </Route>
               </Route>
 
               <Route path="*" element={<Login />} />
