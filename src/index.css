@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --color-onyx: #0a100d;
+  --color-onyx: #060a08;
   --color-greyOlive: #7d7e75;
   --color-paleSlate: #b0b2b8;
   --color-lavender: #cfd6ea;
@@ -10,11 +10,21 @@
 
   --font-mono: "Chivo Mono", monospace;
   --font-serif: "Crimson Pro", serif;
+  --font-gothic: "Jacquard 12", cursive;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: none;
+    font-smooth: never;
+    font-variant-emoji: text;
+  }
 }
 
 @layer utilities {
   .text-shadow-hard-onyx {
-    text-shadow: 2px 2px 0 #0a100d;
+    text-shadow: 2px 2px 0 #060a08;
   }
 
   .text-shadow-hard-greyOlive {

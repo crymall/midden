@@ -48,7 +48,7 @@ const Settings = () => {
                 <Input
                   value={user.username}
                   readOnly
-                  className="w-full bg-onyx border border-greyOlive text-lavender p-2 rounded focus:outline-none focus:border-lavender"
+                  className="w-full bg-onyx border border-greyOlive text-lavender p-2 focus:outline-none focus:border-lavender"
                 />
               </Field>
               <Field>
@@ -56,7 +56,7 @@ const Settings = () => {
                 <Input
                   value={user.email || ""}
                   readOnly
-                  className="w-full bg-onyx border border-greyOlive text-lavender p-2 rounded focus:outline-none focus:border-lavender"
+                  className="w-full bg-onyx border border-greyOlive text-lavender p-2 focus:outline-none focus:border-lavender"
                 />
               </Field>
             </div>

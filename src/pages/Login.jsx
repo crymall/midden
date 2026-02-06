@@ -47,8 +47,8 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-onyx font-mono text-lavender">
-      <div className="w-full min-h-screen md:min-h-0 md:max-w-md bg-darkAmethyst md:border-dashed md:border-4 md:border-evergreen p-8 shadow-xl flex flex-col justify-center">
-        <h1 className="text-3xl font-serif font-bold mb-6 text-center text-white text-shadow-hard-greyOlive">
+      <div className="w-full min-h-screen md:min-h-0 md:max-w-md bg-darkAmethyst md:border-dashed md:border-4 md:border-evergreen p-8 flex flex-col justify-center">
+        <h1 className="text-4xl font-gothic tracking-wide font-bold mb-6 text-center text-white text-shadow-hard-greyOlive">
           {mode === "2fa"
             ? "2-Factor Verification"
             : mode === "register"
@@ -57,12 +57,12 @@ export default function Login() {
         </h1>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-900/50 border border-red-500 text-red-200 text-sm rounded">
+          <div className="mb-4 p-3 bg-red-900/50 border border-red-500 text-red-200 text-sm">
             {error}
           </div>
         )}
         {info && (
-          <div className="mb-4 p-3 bg-blue-900/50 border border-blue-500 text-blue-200 text-sm rounded">
+          <div className="mb-4 p-3 bg-blue-900/50 border border-blue-500 text-blue-200 text-sm">
             {info}
           </div>
         )}
@@ -74,7 +74,7 @@ export default function Login() {
                 Verification Code
               </Label>
               <Input
-                className="w-full bg-onyx border border-greyOlive text-lavender p-2 rounded focus:outline-none focus:border-lavender"
+                className="w-full bg-onyx border border-greyOlive text-lavender p-2 focus:outline-none focus:border-lavender"
                 type="text"
                 placeholder="123456"
                 required
@@ -87,7 +87,7 @@ export default function Login() {
               <Field>
                 <Label className="block text-sm font-bold mb-1">Username</Label>
                 <Input
-                  className="w-full bg-onyx border border-greyOlive text-lavender p-2 rounded focus:outline-none focus:border-lavender"
+                  className="w-full bg-onyx border border-greyOlive text-lavender p-2 focus:outline-none focus:border-lavender"
                   type="text"
                   placeholder="Your username"
                   required
@@ -100,7 +100,7 @@ export default function Login() {
                 <Field>
                   <Label className="block text-sm font-bold mb-1">Email</Label>
                   <Input
-                    className="w-full bg-onyx border border-greyOlive text-lavender p-2 rounded focus:outline-none focus:border-lavender"
+                    className="w-full bg-onyx border border-greyOlive text-lavender p-2 focus:outline-none focus:border-lavender"
                     type="email"
                     placeholder="you@example.com"
                     required
@@ -113,7 +113,7 @@ export default function Login() {
               <Field>
                 <Label className="block text-sm font-bold mb-1">Password</Label>
                 <Input
-                  className="w-full bg-onyx border border-greyOlive text-lavender p-2 rounded focus:outline-none focus:border-lavender"
+                  className="w-full bg-onyx border border-greyOlive text-lavender p-2 focus:outline-none focus:border-lavender"
                   type="password"
                   placeholder="Your password"
                   required
@@ -127,7 +127,7 @@ export default function Login() {
           <div className="flex flex-col gap-3 mt-6">
             <Button
               type="submit"
-              className="w-full bg-greyOlive hover:bg-paleSlate text-onyx font-bold py-2 px-4 rounded transition-colors"
+              className="w-full bg-greyOlive hover:bg-paleSlate text-onyx font-bold py-2 px-4 transition-colors"
             >
               {mode === "2fa"
                 ? "Verify"
@@ -157,7 +157,7 @@ export default function Login() {
             {mode === "login" && (
               <button
                 onClick={toggleMode}
-                className="mb-6 text-center text-sm text-lavender underline hover:text-white"
+                className="mt-2 text-center text-sm text-lavender underline hover:text-white"
               >
                 Create account
               </button>

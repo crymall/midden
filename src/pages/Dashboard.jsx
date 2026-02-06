@@ -8,7 +8,7 @@ const Dashboard = () => {
   return (
     <div>
       <Header user={user} logout={logout} />
-      <main className="min-h-screen flex justify-center items-start bg-onyx md:pt-7.5">
+      <main className="min-h-screen flex justify-center items-start bg-onyx md:pt-5">
         <Outlet />
       </main>
     </div>

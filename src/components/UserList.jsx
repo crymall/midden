@@ -46,7 +46,7 @@ const UserList = () => {
               <td className="px-4 py-3 whitespace-nowrap text-sm text-lavender font-bold">{user.username}</td>
               <td className="px-4 py-3 whitespace-nowrap text-sm">
                 <Select
-                  className="bg-onyx border border-greyOlive text-lavender text-sm rounded p-1 focus:outline-none focus:border-lavender w-full min-w-[100px]"
+                  className="bg-onyx border border-greyOlive text-lavender text-sm p-1 focus:outline-none focus:border-lavender w-full min-w-[100px]"
                   value={ROLES[user.role] ? String(ROLES[user.role]) : ""}
                   onChange={(e) => updateUserRole(user.id, Number(e.target.value))}
                   disabled={isDisabled}
@@ -60,8 +60,9 @@ const UserList = () => {
               </td>
               <td className="px-4 py-3 whitespace-nowrap text-sm">
                 <Button
-                  className="bg-red-900/40 hover:bg-red-900/60 text-red-200 border border-red-800/50 px-3 py-1 rounded text-xs font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-red-950 hover:bg-red-900 border border-red-800 px-2 py-1 text-base transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={isDisabled}
+                  aria-label="Delete User"
                   onClick={() => {
                     if (
                       confirm(`Are you sure you want to delete ${user.username}?`)
@@ -70,7 +71,7 @@ const UserList = () => {
                     }
                   }}
                 >
-                  Delete
+                  ❌
                 </Button>
               </td>
             </tr>
