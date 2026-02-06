@@ -16,9 +16,9 @@ function App() {
             <Route path="/login" element={<Login />} />
 
             <Route element={<RequireAuth />}>
-              <Route path="/dashboard" element={<Dashboard />}>
+              <Route path="/" element={<Dashboard />}>
                 <Route index element={<Explorer />} />
-                <Route path="settings" element={<Settings />} />
+                <Route path="/settings" element={<Settings />} />
               </Route>
             </Route>
 

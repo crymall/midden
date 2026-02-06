@@ -8,7 +8,7 @@ const Header = ({ user, logout }) => {
     <header className="bg-darkAmethyst p-4 flex justify-between items-center border-b-4 border-dashed border-evergreen">
       <div>
         <h1
-          onClick={() => navigate("/dashboard")}
+          onClick={() => navigate("/")}
           className="text-5xl font-gothic text-white cursor-pointer hover:text-lavender transition-colors text-shadow-hard-greyOlive text-shadow-lg tracking-wide"
         >
           Midden
@@ -19,7 +19,7 @@ const Header = ({ user, logout }) => {
           <strong>{user.username}</strong>
         </span>
         <Button
-          onClick={() => navigate("/dashboard/settings")}
+          onClick={() => navigate("/settings")}
           aria-label="Settings"
           className="bg-greyOlive hover:bg-paleSlate text-onyx py-1 px-3 transition-colors text-2xl"
         >
