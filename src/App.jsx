@@ -8,7 +8,7 @@ import Settings from "./pages/Settings";
 import Applications from "./pages/Applications";
 import Experiments from "./pages/Experiments";
 import NotFound from "./pages/NotFound";
-import RequireAuth from "./components/RequireAuth";
+import RequireAuth from "./components/gateways/RequireAuth";
 import RequireNotGuest from "./components/gateways/RequireNotGuest";
 
 function App() {
@@ -30,8 +30,6 @@ function App() {
                 <Route path="*" element={<NotFound />} />
               </Route>
             </Route>
-
-            <Route path="*" element={<NotFound />} />
           </Routes>
         </DataProvider>
       </AuthProvider>
