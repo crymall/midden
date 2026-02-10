@@ -14,9 +14,6 @@
 
 @layer base {
   html {
-    -webkit-font-smoothing: none;
-    -moz-osx-font-smoothing: none;
-    font-smooth: never;
     font-variant-emoji: text;
   }
 }

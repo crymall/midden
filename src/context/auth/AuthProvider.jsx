@@ -56,8 +56,6 @@ const AuthProvider = ({ children }) => {
     const data = await iamApi.verify2FA(userId, code);
     processToken(data.token);
 
-    console.log('verifying login', location.state);
-
     const origin = location.state?.from?.pathname || "/";
     navigate(origin);
 
