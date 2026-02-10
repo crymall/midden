@@ -12,7 +12,7 @@ import {
 import useAuth from "../context/auth/useAuth";
 import useData from "../context/data/useData";
 import UserList from "../components/UserList";
-import Can from "../components/Can";
+import Can from "../components/gateways/Can";
 import MiddenCard from "../components/MiddenCard";
 
 const Settings = () => {

@@ -9,7 +9,7 @@ import Applications from "./pages/Applications";
 import Experiments from "./pages/Experiments";
 import NotFound from "./pages/NotFound";
 import RequireAuth from "./components/RequireAuth";
-import RequireNotGuest from "./components/RequireNotGuest";
+import RequireNotGuest from "./components/gateways/RequireNotGuest";
 
 function App() {
   return (

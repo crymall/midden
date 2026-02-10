@@ -1,23 +1,11 @@
 import MiddenCard from "../components/MiddenCard";
 import AppGrid from "../components/AppGrid";
+import { explorerLinkList } from "./utils/constants";
 
 const Explorer = () => {
-  const items = [
-    {
-      label: "Applications",
-      symbol: "💻",
-      to: "/applications",
-    },
-    {
-      label: "Experiments",
-      symbol: "🧪",
-      to: "/experiments",
-    }
-  ];
-
   return (
     <MiddenCard>
-      <AppGrid items={items} />
+      <AppGrid items={explorerLinkList} />
     </MiddenCard>
   );
 };

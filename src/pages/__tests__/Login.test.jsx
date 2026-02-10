@@ -1,0 +1,99 @@
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import Login from "../Login";
+import useAuth from "../../context/auth/useAuth";
+
+vi.mock("../../context/auth/useAuth");
+
+describe("Login Component", () => {
+  const mockLogin = vi.fn();
+  const mockVerifyLogin = vi.fn();
+  const mockRegister = vi.fn();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    useAuth.mockReturnValue({
+      login: mockLogin,
+      verifyLogin: mockVerifyLogin,
+      register: mockRegister,
+    });
+  });
+
+  it("renders login form by default", () => {
+    render(<Login />);
+    expect(screen.getByRole("heading", { name: /log in/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^login$/i })).toBeInTheDocument();
+  });
+
+  it("switches to register mode", async () => {
+    const user = userEvent.setup();
+    render(<Login />);
+
+    const createAccountBtn = screen.getByRole("button", { name: /create account/i });
+    await user.click(createAccountBtn);
+
+    expect(screen.getByRole("heading", { name: /create account/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^register$/i })).toBeInTheDocument();
+  });
+
+  it("calls login function on form submission", async () => {
+    const user = userEvent.setup();
+    mockLogin.mockResolvedValue({ token: "fake-token" });
+
+    render(<Login />);
+
+    await user.type(screen.getByLabelText(/username/i), "testuser");
+    await user.type(screen.getByLabelText(/password/i), "password123");
+    await user.click(screen.getByRole("button", { name: /^login$/i }));
+
+    expect(mockLogin).toHaveBeenCalledWith("testuser", "password123");
+  });
+
+  it("transitions to 2FA mode when login requires it", async () => {
+    const user = userEvent.setup();
+    // Simulate login response requiring 2FA (no token, but userId present)
+    mockLogin.mockResolvedValue({ userId: "123", message: "Enter code" });
+
+    render(<Login />);
+
+    await user.type(screen.getByLabelText(/username/i), "testuser");
+    await user.type(screen.getByLabelText(/password/i), "password123");
+    await user.click(screen.getByRole("button", { name: /^login$/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: /2-factor verification/i })).toBeInTheDocument();
+    });
+    expect(screen.getByLabelText(/verification code/i)).toBeInTheDocument();
+  });
+
+  it("handles guest login", async () => {
+    const user = userEvent.setup();
+    mockLogin.mockResolvedValue({ token: "guest-token" });
+
+    render(<Login />);
+
+    const guestBtn = screen.getByRole("button", { name: /guest login/i });
+    await user.click(guestBtn);
+
+    expect(mockLogin).toHaveBeenCalledWith("guest", "guest");
+  });
+
+  it("displays error message on login failure", async () => {
+    const user = userEvent.setup();
+    const errorMsg = "Invalid credentials";
+    mockLogin.mockRejectedValue({ response: { data: { error: errorMsg } } });
+
+    render(<Login />);
+    await user.type(screen.getByLabelText(/username/i), "testuser");
+    await user.type(screen.getByLabelText(/password/i), "password123");
+    await user.click(screen.getByRole("button", { name: /^login$/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(errorMsg)).toBeInTheDocument();
+    });
+  });
+});

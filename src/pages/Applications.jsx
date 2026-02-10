@@ -1,16 +1,11 @@
 import MiddenCard from "../components/MiddenCard";
 import AppGrid from "../components/AppGrid";
+import { applicationList } from "./utils/constants";
 
 const Applications = () => {
   return (
     <MiddenCard>
-      <AppGrid items={[
-        {
-          label: "Back",
-          symbol: "⬅️",
-          to: "/",
-        }
-      ]} />
+      <AppGrid items={applicationList} />
     </MiddenCard>
   );
 };
