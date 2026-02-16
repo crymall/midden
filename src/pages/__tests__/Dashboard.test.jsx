@@ -3,6 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect, vi } from "vitest";
 import Dashboard from "../Dashboard";
 import useAuth from "../../context/auth/useAuth";
+import { navMeta } from "../../utils/constants";
 
 vi.mock("../../context/auth/useAuth");
 
@@ -15,7 +16,7 @@ describe("Dashboard Component", () => {
 
     render(
       <MemoryRouter>
-        <Dashboard />
+        <Dashboard navMeta={navMeta.midden} />
       </MemoryRouter>
     );
 

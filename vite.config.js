@@ -13,6 +13,12 @@ export default defineConfig(() => {
           secure: false,
           rewrite: (path) => path.replace(/^\/iam/, ''),
         },
+        '/canteen': {
+          target: 'http://localhost:3001',
+          changeOrigin: true,
+          secure: false,
+          rewrite: (path) => path.replace(/^\/canteen/, ''),
+        },
       },
     },
     test: {

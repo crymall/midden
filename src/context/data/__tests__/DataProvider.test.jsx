@@ -7,7 +7,7 @@ import * as iamApi from "../../../services/iamApi";
 
 // Mock the dependencies
 vi.mock("../../../services/iamApi");
-vi.mock("../../../constants/roles", () => ({
+vi.mock("../../../utils/constants", () => ({
   ROLES: {
     ADMIN: "role_admin_id",
     USER: "role_user_id",

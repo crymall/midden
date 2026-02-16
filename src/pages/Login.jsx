@@ -59,9 +59,9 @@ export default function Login() {
   };
 
   return (
-    <div className="bg-onyx text-lavender flex min-h-screen items-center justify-center font-mono">
-      <div className="bg-darkAmethyst md:border-evergreen flex min-h-screen w-full flex-col justify-center p-8 md:min-h-0 md:max-w-md md:border-4 md:border-dashed">
-        <h1 className="font-gothic text-shadow-hard-greyOlive mb-6 text-center text-4xl font-bold tracking-wide text-white">
+    <div className="bg-dark text-lightestGrey flex min-h-screen items-center justify-center font-mono">
+      <div className="bg-primary md:border-accent flex min-h-screen w-full flex-col justify-center p-8 md:min-h-0 md:max-w-md md:border-4 md:border-dashed">
+        <h1 className="font-gothic text-shadow-hard-grey mb-6 text-center text-4xl font-bold tracking-wide text-white">
           {mode === "2fa"
             ? "2-Factor Verification"
             : mode === "register"
@@ -87,7 +87,7 @@ export default function Login() {
                 Verification Code
               </Label>
               <Input
-                className="bg-onyx border-greyOlive text-lavender focus:border-lavender w-full border p-2 focus:outline-none"
+                className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full border p-2 focus:outline-none"
                 type="text"
                 placeholder="123456"
                 required
@@ -100,7 +100,7 @@ export default function Login() {
               <Field>
                 <Label className="mb-1 block text-sm font-bold">Username</Label>
                 <Input
-                  className="bg-onyx border-greyOlive text-lavender focus:border-lavender w-full border p-2 focus:outline-none"
+                  className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full border p-2 focus:outline-none"
                   type="text"
                   placeholder="Your username"
                   required
@@ -113,7 +113,7 @@ export default function Login() {
                 <Field>
                   <Label className="mb-1 block text-sm font-bold">Email</Label>
                   <Input
-                    className="bg-onyx border-greyOlive text-lavender focus:border-lavender w-full border p-2 focus:outline-none"
+                    className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full border p-2 focus:outline-none"
                     type="email"
                     placeholder="you@example.com"
                     required
@@ -126,7 +126,7 @@ export default function Login() {
               <Field>
                 <Label className="mb-1 block text-sm font-bold">Password</Label>
                 <Input
-                  className="bg-onyx border-greyOlive text-lavender focus:border-lavender w-full border p-2 focus:outline-none"
+                  className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full border p-2 focus:outline-none"
                   type="password"
                   placeholder="Your password"
                   required
@@ -140,7 +140,7 @@ export default function Login() {
           <div className="mt-6 flex flex-col gap-3">
             <Button
               type="submit"
-              className="bg-greyOlive hover:bg-paleSlate text-onyx w-full px-4 py-2 font-bold transition-colors"
+              className="bg-grey hover:bg-lightGrey text-dark w-full px-4 py-2 font-bold transition-colors"
             >
               {mode === "2fa"
                 ? "Verify"
@@ -152,7 +152,7 @@ export default function Login() {
               <Button
                 type="button"
                 onClick={toggleMode}
-                className="text-paleSlate text-sm underline hover:text-white"
+                className="text-lightGrey text-sm underline hover:text-white"
               >
                 Already have an account? Login
               </Button>
@@ -161,7 +161,7 @@ export default function Login() {
               <Button
                 type="button"
                 onClick={() => setMode("login")}
-                className="text-paleSlate text-sm underline hover:text-white"
+                className="text-lightGrey text-sm underline hover:text-white"
               >
                 Back to Login
               </Button>
@@ -172,14 +172,14 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={toggleMode}
-                  className="text-lavender mt-2 text-center text-sm underline hover:text-white"
+                  className="text-lightestGrey mt-2 text-center text-sm underline hover:text-white"
                 >
                   Create Account
                 </button>
                 <button
                   type="button"
                   onClick={handleGuestLogin}
-                  className="text-lavender text-center text-sm underline hover:text-white"
+                  className="text-lightestGrey text-center text-sm underline hover:text-white"
                 >
                   Guest Login
                 </button>

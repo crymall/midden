@@ -1,21 +1,32 @@
+export const ROLES = {
+  Admin: 1,
+  Editor: 2,
+  Viewer: 3,
+};
+
+export const navMeta = {
+  midden: {
+    title: "Midden",
+    titleLink: "/",
+    navLinks: [{ to: "/", label: "About", ariaLabel: "about" }],
+  },
+  canteen: {
+    title: "Canteen",
+    titleLink: "/applications/canteen",
+    navLinks: [],
+  },
+};
+
 export const explorerLinkList = [
   {
-    label: "Applications",
-    symbol: "💻",
-    to: "/applications",
+    label: "Canteen",
+    symbol: "🍔",
+    to: "/applications/canteen",
   },
   {
     label: "Experiments",
     symbol: "🧪",
     to: "/experiments",
-  },
-];
-
-export const applicationList = [
-  {
-    label: "Back",
-    symbol: "⬅️",
-    to: "/",
   },
 ];
 

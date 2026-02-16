@@ -28,12 +28,12 @@ const Settings = () => {
   return (
     <MiddenCard title="Settings">
       <TabGroup>
-        <TabList className="border-greyOlive mb-6 flex space-x-4 border-b">
-          <Tab className="data-selected:border-lavender data-selected:text-lavender text-greyOlive hover:text-paleSlate cursor-pointer px-4 py-2 text-sm font-bold transition-colors focus:outline-none data-selected:border-b-2">
+        <TabList className="border-grey mb-6 flex space-x-4 border-b">
+          <Tab className="data-selected:border-lightestGrey data-selected:text-lightestGrey text-grey hover:text-lightGrey cursor-pointer px-4 py-2 text-sm font-bold transition-colors focus:outline-none data-selected:border-b-2">
             Profile
           </Tab>
           <Can perform="read:users">
-            <Tab className="data-selected:border-lavender data-selected:text-lavender text-greyOlive hover:text-paleSlate cursor-pointer px-4 py-2 text-sm font-bold transition-colors focus:outline-none data-selected:border-b-2">
+            <Tab className="data-selected:border-lightestGrey data-selected:text-lightestGrey text-grey hover:text-lightGrey cursor-pointer px-4 py-2 text-sm font-bold transition-colors focus:outline-none data-selected:border-b-2">
               Admin Panel
             </Tab>
           </Can>
@@ -46,23 +46,23 @@ const Settings = () => {
             </h2>
             <div className="max-w-md space-y-4">
               <Field>
-                <Label className="text-lavender mb-1 block text-sm font-bold">
+                <Label className="text-lightestGrey mb-1 block text-sm font-bold">
                   Username
                 </Label>
                 <Input
                   value={user.username}
                   readOnly
-                  className="bg-onyx border-greyOlive text-lavender focus:border-lavender w-full border p-2 focus:outline-none"
+                  className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full border p-2 focus:outline-none"
                 />
               </Field>
               <Field>
-                <Label className="text-lavender mb-1 block text-sm font-bold">
+                <Label className="text-lightestGrey mb-1 block text-sm font-bold">
                   Email
                 </Label>
                 <Input
                   value={user.email || ""}
                   readOnly
-                  className="bg-onyx border-greyOlive text-lavender focus:border-lavender w-full border p-2 focus:outline-none"
+                  className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full border p-2 focus:outline-none"
                 />
               </Field>
             </div>

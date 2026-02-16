@@ -1,7 +1,7 @@
 import { Button, Select } from "@headlessui/react";
 import useData from "../context/data/useData";
 import useAuth from "../context/auth/useAuth";
-import { ROLES } from "../constants/roles";
+import { ROLES } from "../utils/constants";
 
 const UserList = () => {
   const { users, usersLoading, deleteUser, updateUserRole } = useData();
@@ -12,16 +12,16 @@ const UserList = () => {
   }));
 
   if (usersLoading) {
-    return <div className="text-lavender p-4">Loading...</div>;
+    return <div className="text-lightestGrey p-4">Loading...</div>;
   }
 
   if (!users || users.length === 0) {
-    return <p className="text-paleSlate p-4">No users found.</p>;
+    return <p className="text-lightGrey p-4">No users found.</p>;
   }
 
   return (
     <div className="overflow-x-auto">
-      <table className="divide-greyOlive/30 min-w-full divide-y">
+      <table className="divide-grey/30 min-w-full divide-y">
         <thead className="bg-white/5">
           <tr>
             <th className="px-4 py-3 text-left text-xs font-bold tracking-wider text-white uppercase">
@@ -38,7 +38,7 @@ const UserList = () => {
             </th>
           </tr>
         </thead>
-        <tbody className="divide-greyOlive/30 divide-y">
+        <tbody className="divide-grey/30 divide-y">
           {users.map((user) => {
             const isCurrentUser = currentUser && currentUser.id === user.id;
             const isAdmin = user.role === "Admin";
@@ -46,15 +46,15 @@ const UserList = () => {
 
             return (
               <tr key={user.id} className="transition-colors hover:bg-white/5">
-                <td className="text-lavender px-4 py-3 text-sm whitespace-nowrap">
+                <td className="text-lightestGrey px-4 py-3 text-sm whitespace-nowrap">
                   {user.id}
                 </td>
-                <td className="text-lavender px-4 py-3 text-sm font-bold whitespace-nowrap">
+                <td className="text-lightestGrey px-4 py-3 text-sm font-bold whitespace-nowrap">
                   {user.username}
                 </td>
                 <td className="px-4 py-3 text-sm whitespace-nowrap">
                   <Select
-                    className="bg-onyx border-greyOlive text-lavender focus:border-lavender w-full min-w-25 border p-1 text-sm focus:outline-none"
+                    className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full min-w-25 border p-1 text-sm focus:outline-none"
                     value={ROLES[user.role] ? String(ROLES[user.role]) : ""}
                     onChange={(e) =>
                       updateUserRole(user.id, Number(e.target.value))

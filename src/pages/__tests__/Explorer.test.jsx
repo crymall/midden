@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect } from "vitest";
 import Explorer from "../Explorer";
-import { explorerLinkList } from "../utils/constants";
+import { explorerLinkList } from "../../utils/constants";
 
 describe("Explorer Component", () => {
   it("renders all explorer links", () => {

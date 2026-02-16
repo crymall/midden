@@ -41,8 +41,8 @@ describe("AppCard Component", () => {
       </MemoryRouter>
     );
     const link = screen.getByRole("link");
-    expect(link).toHaveClass("w-36");
-    expect(link).not.toHaveClass("md:w-64");
+    expect(link).toHaveClass("w-20");
+    expect(link).not.toHaveClass("md:w-46");
   });
 
   it("renders description when provided", () => {

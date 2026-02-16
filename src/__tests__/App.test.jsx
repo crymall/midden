@@ -18,7 +18,6 @@ vi.mock("../context/auth/useAuth");
 vi.mock("../pages/Login", () => ({ default: () => <div>Login Page</div> }));
 vi.mock("../pages/Explorer", () => ({ default: () => <div>Explorer Page</div> }));
 vi.mock("../pages/Settings", () => ({ default: () => <div>Settings Page</div> }));
-vi.mock("../pages/Applications", () => ({ default: () => <div>Applications Page</div> }));
 vi.mock("../pages/Experiments", () => ({ default: () => <div>Experiments Page</div> }));
 vi.mock("../pages/NotFound", () => ({ default: () => <div>NotFound Page</div> }));
 
@@ -66,13 +65,6 @@ describe("App Routing", () => {
     // Should redirect to / which renders Explorer
     expect(screen.queryByText("Settings Page")).not.toBeInTheDocument();
     expect(screen.getByText("Explorer Page")).toBeInTheDocument();
-  });
-
-  it("renders Applications page", () => {
-    window.history.pushState({}, "Apps", "/applications");
-    useAuth.mockReturnValue({ user: { username: "testuser" } });
-    render(<App />);
-    expect(screen.getByText("Applications Page")).toBeInTheDocument();
   });
 
   it("renders Experiments page", () => {

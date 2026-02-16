@@ -10,7 +10,7 @@ vi.mock("../../context/data/useData");
 vi.mock("../../context/auth/useAuth");
 
 // Mock the roles constant since it's imported in the component
-vi.mock("../../constants/roles", () => ({
+vi.mock("../../utils/constants", () => ({
   ROLES: { Admin: 1, Editor: 2 },
 }));
 

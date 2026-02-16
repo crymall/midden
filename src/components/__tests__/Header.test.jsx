@@ -16,11 +16,18 @@ vi.mock("react-router-dom", async () => {
 describe("Header Component", () => {
   const mockLogout = vi.fn();
   const user = { username: "testuser" };
+  const defaultProps = {
+    user,
+    logout: mockLogout,
+    title: "Midden",
+    titleLink: "/",
+    navLinks: [],
+  };
 
   it("renders user information", () => {
     render(
       <MemoryRouter>
-        <Header user={user} logout={mockLogout} />
+        <Header {...defaultProps} />
       </MemoryRouter>
     );
     expect(screen.getByText("Midden")).toBeInTheDocument();
@@ -31,7 +38,7 @@ describe("Header Component", () => {
     const user = userEvent.setup();
     render(
       <MemoryRouter>
-        <Header user={user} logout={mockLogout} />
+        <Header {...defaultProps} />
       </MemoryRouter>
     );
     
@@ -44,7 +51,7 @@ describe("Header Component", () => {
     const user = userEvent.setup();
     render(
       <MemoryRouter>
-        <Header user={user} logout={mockLogout} />
+        <Header {...defaultProps} />
       </MemoryRouter>
     );
     
@@ -56,7 +63,23 @@ describe("Header Component", () => {
 
   it("does not show settings button for guest user", () => {
     const guestUser = { username: "guest" };
-    render(<Header user={guestUser} logout={mockLogout} />);
+    render(
+      <MemoryRouter>
+        <Header {...defaultProps} user={guestUser} />
+      </MemoryRouter>
+    );
     expect(screen.queryByRole("button", { name: /settings/i })).not.toBeInTheDocument();
+  });
+
+  it("renders navigation links when provided", () => {
+    const navLinks = [
+      { to: "/test", label: "Test Link", ariaLabel: "Test" },
+    ];
+    render(
+      <MemoryRouter>
+        <Header {...defaultProps} navLinks={navLinks} />
+      </MemoryRouter>
+    );
+    expect(screen.getByText("Test Link")).toBeInTheDocument();
   });
 });
