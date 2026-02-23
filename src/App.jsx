@@ -13,6 +13,8 @@ import RecipeDetail from "./pages/Canteen/RecipeDetail";
 import NewRecipe from "./pages/Canteen/NewRecipe";
 import RequireAuth from "./components/gateways/RequireAuth";
 import RequireNotGuest from "./components/gateways/RequireNotGuest";
+import MyLists from "./pages/Canteen/MyLists";
+import ListView from "./pages/Canteen/ListView";
 import { navMeta } from "./utils/constants";
 
 function App() {
@@ -32,6 +34,8 @@ function App() {
                 <Route path="recipes" element={<RecipeSearch />} />
                 <Route path="recipes/new" element={<NewRecipe />} />
                 <Route path="recipes/:id" element={<RecipeDetail />} />
+                <Route path="my-lists" element={<MyLists />} />
+                <Route path="my-lists/:id" element={<ListView />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
 

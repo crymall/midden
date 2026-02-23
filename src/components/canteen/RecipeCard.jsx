@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
+import Can from "../gateways/Can";
+import ListAddPopover from "./ListAddPopover";
 
 const RecipeCard = ({ recipe }) => {
+
   const truncateDescription = (text) => {
     if (!text) return "";
     if (text.length <= 150) return text;
@@ -10,11 +13,16 @@ const RecipeCard = ({ recipe }) => {
   };
 
   return (
-    <Link
-      to={`/applications/canteen/recipes/${recipe.id}`}
-      className="bg-primary/20 border-accent hover:bg-primary/40 group flex flex-col gap-2 border-2 border-dashed p-4 transition-all"
-    >
-      <div className="flex items-start justify-between gap-2">
+    <>
+      <div className="bg-primary/20 border-accent hover:bg-primary/40 group relative flex flex-col gap-2 border-2 border-dashed p-4 transition-all">
+        <Link
+          to={`/applications/canteen/recipes/${recipe.id}`}
+          className="absolute inset-0 z-0"
+        >
+          <span className="sr-only">View {recipe.title}</span>
+        </Link>
+
+        <div className="pointer-events-none relative z-10 flex items-start justify-between gap-2">
         <h3 className="font-mono text-xl font-bold text-white transition-colors group-hover:text-lightestGrey">
           {recipe.title}
         </h3>
@@ -25,11 +33,12 @@ const RecipeCard = ({ recipe }) => {
         )}
       </div>
 
-      <p className="text-lightGrey mb-2 text-sm font-mono">
+      <p className="text-lightGrey pointer-events-none relative z-10 mb-2 font-mono text-sm">
         {truncateDescription(recipe.description)}
       </p>
 
-      <div className="mt-auto flex flex-wrap gap-2">
+      <div className="pointer-events-none relative z-10 mt-auto flex flex-wrap items-end justify-between gap-2">
+        <div className="flex flex-wrap gap-2">
         {recipe.tags &&
           recipe.tags.map((tag) => (
             <span
@@ -39,8 +48,19 @@ const RecipeCard = ({ recipe }) => {
               {tag.name}
             </span>
           ))}
+        </div>
+        <Can perform="write:canteen">
+          <ListAddPopover
+            recipeId={recipe.id}
+            className="pointer-events-auto relative z-20"
+            buttonClassName="bg-grey hover:bg-lightGrey text-dark px-2 py-1 text-xs font-bold transition-colors focus:outline-none"
+            panelClassName="right-0 bottom-full mb-2"
+            label="+ Add"
+          />
+        </Can>
       </div>
-    </Link>
+      </div>
+    </>
   );
 };
 

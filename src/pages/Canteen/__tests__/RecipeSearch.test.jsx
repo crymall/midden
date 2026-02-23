@@ -67,7 +67,7 @@ describe("RecipeSearch", () => {
   it("handles pagination interactions", () => {
     // Mock enough recipes to enable Next button (>= limit)
     useData.mockReturnValue({
-      recipes: Array(20).fill({ id: 1 }),
+      recipes: Array.from({ length: 20 }, (_, i) => ({ id: i + 1 })),
       recipesLoading: false,
       getRecipes: mockGetRecipes,
     });
@@ -115,7 +115,7 @@ describe("RecipeSearch", () => {
 
   it("disables Next button when fewer recipes than limit are returned", () => {
     useData.mockReturnValue({
-      recipes: Array(10).fill({ id: 1 }), // 10 < 20
+      recipes: Array.from({ length: 10 }, (_, i) => ({ id: i + 1 })), // 10 < 20
       recipesLoading: false,
       getRecipes: mockGetRecipes,
     });

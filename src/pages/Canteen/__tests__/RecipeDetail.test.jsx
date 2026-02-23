@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import RecipeDetail from "../RecipeDetail";
 import useData from "../../../context/data/useData";
@@ -21,6 +21,14 @@ vi.mock("../../../components/gateways/Can", () => ({
   default: ({ children }) => <div data-testid="can-gate">{children}</div>,
 }));
 
+vi.mock("../../../components/canteen/ListAddPopover", () => ({
+  default: ({ recipeId, label }) => (
+    <button data-testid="list-add-popover" data-recipe-id={recipeId}>
+      {label}
+    </button>
+  ),
+}));
+
 // Mock Headless UI Dialog to avoid portal issues in tests
 vi.mock("@headlessui/react", async () => {
   const actual = await vi.importActual("@headlessui/react");
@@ -35,7 +43,6 @@ describe("RecipeDetail", () => {
   const mockGetRecipe = vi.fn();
   const mockToggleRecipeLike = vi.fn();
   const mockGetUserLists = vi.fn();
-  const mockAddRecipeToList = vi.fn();
 
   const mockRecipe = {
     id: "123",
@@ -62,9 +69,6 @@ describe("RecipeDetail", () => {
     toggleRecipeLike: mockToggleRecipeLike,
     userLists: [],
     getUserLists: mockGetUserLists,
-    canteenApi: {
-      addRecipeToList: mockAddRecipeToList,
-    },
   };
 
   beforeEach(() => {
@@ -125,31 +129,11 @@ describe("RecipeDetail", () => {
     expect(screen.getByText("♥ Liked")).toBeInTheDocument();
   });
 
-  it("opens add to list dialog and adds recipe", async () => {
-    const mockLists = [{ id: "list1", name: "My Favorites" }];
-    useData.mockReturnValue({
-      ...defaultContext,
-      userLists: mockLists,
-    });
-
+  it("renders add to list popover", () => {
     render(<RecipeDetail />);
-
-    // Open dialog
-    fireEvent.click(screen.getByText("+ Add to List"));
-    expect(screen.getByText("Add to List")).toBeInTheDocument();
-
-    // Select list
-    const select = screen.getByRole("combobox");
-    fireEvent.change(select, { target: { value: "list1" } });
-
-    // Click Add
-    const addBtn = screen.getByRole("button", { name: "Add" });
-    fireEvent.click(addBtn);
-
-    await waitFor(() => {
-      expect(mockAddRecipeToList).toHaveBeenCalledWith("list1", "123");
-    });
-
-    expect(await screen.findByText("Recipe added to list!")).toBeInTheDocument();
+    const popover = screen.getByTestId("list-add-popover");
+    expect(popover).toBeInTheDocument();
+    expect(popover).toHaveAttribute("data-recipe-id", "123");
+    expect(popover).toHaveTextContent("+ Add to List");
   });
 });

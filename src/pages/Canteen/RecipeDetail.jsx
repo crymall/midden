@@ -1,17 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  Button,
-  Dialog,
-  DialogPanel,
-  Select,
-  Field,
-  Label,
-} from "@headlessui/react";
+import { Button } from "@headlessui/react";
 import useData from "../../context/data/useData";
 import useAuth from "../../context/auth/useAuth";
 import MiddenCard from "../../components/MiddenCard";
 import Can from "../../components/gateways/Can";
+import ListAddPopover from "../../components/canteen/ListAddPopover";
 
 const RecipeDetail = () => {
   const { id } = useParams();
@@ -20,15 +14,9 @@ const RecipeDetail = () => {
     recipesLoading,
     getRecipe,
     toggleRecipeLike,
-    userLists,
     getUserLists,
-    canteenApi,
   } = useData();
   const { user } = useAuth();
-
-  const [isAddToListOpen, setIsAddToListOpen] = useState(false);
-  const [selectedListId, setSelectedListId] = useState("");
-  const [addListMessage, setAddListMessage] = useState("");
 
   useEffect(() => {
     if (id) {
@@ -70,22 +58,6 @@ const RecipeDetail = () => {
 
   const handleLike = () => {
     toggleRecipeLike(currentRecipe.id, isLiked);
-  };
-
-  const handleAddToList = async () => {
-    if (!selectedListId) return;
-    try {
-      await canteenApi.addRecipeToList(selectedListId, currentRecipe.id);
-      setAddListMessage("Recipe added to list!");
-      setTimeout(() => {
-        setAddListMessage("");
-        setIsAddToListOpen(false);
-        setSelectedListId("");
-      }, 1500);
-    } catch (error) {
-      console.error(error);
-      setAddListMessage("Failed to add to list.");
-    }
   };
 
   return (
@@ -131,12 +103,13 @@ const RecipeDetail = () => {
                 >
                   {isLiked ? "♥ Liked" : "♡ Like"}
                 </Button>
-                <Button
-                  onClick={() => setIsAddToListOpen(true)}
-                  className="bg-grey hover:bg-lightGrey text-dark px-2 py-1 font-bold transition-colors"
-                >
-                  + Add to List
-                </Button>
+                <ListAddPopover
+                  recipeId={currentRecipe.id}
+                  className="relative"
+                  buttonClassName="bg-grey hover:bg-lightGrey text-dark px-2 py-1 font-bold transition-colors"
+                  panelClassName="right-0 top-full mt-2"
+                  label="+ Add to List"
+                />
               </div>
             </Can>
           </div>
@@ -207,64 +180,6 @@ const RecipeDetail = () => {
         </div>
       </div>
 
-      {/* Add to List Modal */}
-      <Dialog
-        open={isAddToListOpen}
-        onClose={() => setIsAddToListOpen(false)}
-        className="relative z-50"
-      >
-        <div className="fixed inset-0 bg-black/70" aria-hidden="true" />
-        <div className="fixed inset-0 flex items-center justify-center p-4">
-          <DialogPanel className="bg-dark border-accent w-full max-w-md border-2 border-dashed p-6 shadow-xl">
-            <h3 className="font-gothic mb-4 text-3xl text-white">
-              Add to List
-            </h3>
-
-            {addListMessage ? (
-              <p
-                className={`mb-4 text-center font-mono font-bold ${addListMessage.includes("Failed") ? "text-red-400" : "text-accent"}`}
-              >
-                {addListMessage}
-              </p>
-            ) : (
-              <div className="flex flex-col gap-4">
-                <Field>
-                  <Label className="text-lightestGrey mb-1 block text-sm font-bold">
-                    Select a List
-                  </Label>
-                  <Select
-                    value={selectedListId}
-                    onChange={(e) => setSelectedListId(e.target.value)}
-                    className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full border p-2 focus:outline-none"
-                  >
-                    <option value="">-- Choose a list --</option>
-                    {userLists.map((list) => (
-                      <option key={list.id} value={list.id}>
-                        {list.name}
-                      </option>
-                    ))}
-                  </Select>
-                </Field>
-                <div className="mt-2 flex justify-end gap-2">
-                  <Button
-                    onClick={() => setIsAddToListOpen(false)}
-                    className="text-lightGrey px-4 py-2 font-bold hover:text-white"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleAddToList}
-                    disabled={!selectedListId}
-                    className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    Add
-                  </Button>
-                </div>
-              </div>
-            )}
-          </DialogPanel>
-        </div>
-      </Dialog>
     </MiddenCard>
   );
 };

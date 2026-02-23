@@ -15,6 +15,8 @@ export const DataProvider = ({ children }) => {
   const [ingredients, setIngredients] = useState([]);
   const [tags, setTags] = useState([]);
   const [userLists, setUserLists] = useState([]);
+  const [currentListRecipes, setCurrentListRecipes] = useState([]);
+  const [comboboxLists, setComboboxLists] = useState([]);
 
   const fetchUsers = useCallback(async () => {
     setUsersLoading(true);
@@ -118,12 +120,45 @@ export const DataProvider = ({ children }) => {
     }
   }, []);
 
-  const getUserLists = useCallback(async (userId) => {
+  const getUserLists = useCallback(async (userId, limit = 20, offset = 0, name = "", sort = "created_at", order = "DESC") => {
     try {
-      const data = await canteenApi.fetchUserLists(userId);
+      const data = await canteenApi.fetchUserLists(userId, limit, offset, name, sort, order);
       setUserLists(data);
     } catch (err) {
       console.error("Fetch user lists failed", err);
+    }
+  }, []);
+
+  const getComboboxLists = useCallback(async (userId, query = "") => {
+    try {
+      const data = await canteenApi.fetchUserLists(userId, 10, 0, query, "updated_at", "DESC");
+      setComboboxLists(data);
+    } catch (err) {
+      console.error("Fetch combobox lists failed", err);
+    }
+  }, []);
+
+  const updateComboboxListTimestamp = useCallback((listId) => {
+    const now = new Date().toISOString();
+    setComboboxLists((prev) => {
+      if (prev.length === 0) return [];
+
+      // Update the specific list's timestamp
+      return prev.map((list) =>
+        list.id === listId ? { ...list, updated_at: now } : list
+      );
+    });
+  }, []);
+
+  const getListRecipes = useCallback(async (id, limit, offset) => {
+    setRecipesLoading(true);
+    try {
+      const data = await canteenApi.fetchListRecipes(id, limit, offset);
+      setCurrentListRecipes(data);
+    } catch (err) {
+      console.error("Fetch list recipes failed", err);
+    } finally {
+      setRecipesLoading(false);
     }
   }, []);
 
@@ -191,6 +226,11 @@ export const DataProvider = ({ children }) => {
         clearIngredients,
         getTags,
         getUserLists,
+        getListRecipes,
+        comboboxLists,
+        getComboboxLists,
+        updateComboboxListTimestamp,
+        currentListRecipes,
         toggleRecipeLike,
         createRecipe,
         createTag,

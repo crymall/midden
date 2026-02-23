@@ -25,6 +25,11 @@ export const navMeta = {
         ariaLabel: "new-recipe",
       },
       {
+        to: "/applications/canteen/my-lists",
+        label: "My Lists",
+        ariaLabel: "my-lists",
+      },
+      {
         to: "/",
         label: "Back to Midden",
         ariaLabel: "back-to-midden",
