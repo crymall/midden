@@ -360,7 +360,7 @@ const NewRecipe = () => {
                     }
                     className={`${baseInputClass} w-24 flex-none`}
                   />
-                  <div className="relative min-w-[100px] flex-1">
+                  <div className="relative min-w-25 flex-1">
                     <Combobox
                       value={ing}
                       onChange={async (val) => {
@@ -411,7 +411,7 @@ const NewRecipe = () => {
                             <ComboboxOption
                               key={suggestion.id}
                               value={suggestion}
-                              className="data-[focus]:bg-accent text-lightestGrey cursor-pointer px-4 py-2 select-none data-[focus]:text-white"
+                              className="data-focus:bg-accent text-lightestGrey cursor-pointer px-4 py-2 select-none data-focus:text-white"
                             >
                               {suggestion.name}
                             </ComboboxOption>
@@ -424,7 +424,7 @@ const NewRecipe = () => {
                             ) && (
                               <ComboboxOption
                                 value={{ action: "create", name: ing.name }}
-                                className="data-[focus]:bg-accent text-lightestGrey cursor-pointer px-4 py-2 font-bold italic select-none data-[focus]:text-white"
+                                className="data-focus:bg-accent text-lightestGrey cursor-pointer px-4 py-2 font-bold italic select-none data-focus:text-white"
                               >
                                 Create "{ing.name}"
                               </ComboboxOption>
@@ -487,7 +487,6 @@ const NewRecipe = () => {
         </div>
       </form>
 
-      {/* Create Tag Modal */}
       <Dialog
         open={isTagModalOpen}
         onClose={() => setIsTagModalOpen(false)}
@@ -526,7 +525,6 @@ const NewRecipe = () => {
         </div>
       </Dialog>
 
-      {/* Create Ingredient Modal */}
       <Dialog
         open={isIngredientModalOpen}
         onClose={() => setIsIngredientModalOpen(false)}
