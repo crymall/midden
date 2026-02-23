@@ -42,7 +42,6 @@ vi.mock("@headlessui/react", async () => {
 describe("RecipeDetail", () => {
   const mockGetRecipe = vi.fn();
   const mockToggleRecipeLike = vi.fn();
-  const mockGetUserLists = vi.fn();
 
   const mockRecipe = {
     id: "123",
@@ -67,8 +66,7 @@ describe("RecipeDetail", () => {
     recipesLoading: false,
     getRecipe: mockGetRecipe,
     toggleRecipeLike: mockToggleRecipeLike,
-    userLists: [],
-    getUserLists: mockGetUserLists,
+    getUserLists: vi.fn(),
   };
 
   beforeEach(() => {
@@ -77,10 +75,9 @@ describe("RecipeDetail", () => {
     useAuth.mockReturnValue({ user: mockUser });
   });
 
-  it("fetches recipe and user lists on mount", () => {
+  it("fetches recipe on mount", () => {
     render(<RecipeDetail />);
     expect(mockGetRecipe).toHaveBeenCalledWith("123");
-    expect(mockGetUserLists).toHaveBeenCalledWith("user1");
   });
 
   it("renders loading state", () => {

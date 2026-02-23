@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import RecipeCard from '../RecipeCard';
@@ -12,68 +12,19 @@ vi.mock("../../gateways/Can", () => ({
   default: ({ children }) => <div data-testid="can-gate">{children}</div>,
 }));
 
-// Mock Headless UI
-vi.mock("@headlessui/react", async () => {
-  const actual = await vi.importActual("@headlessui/react");
-  return {
-    ...actual,
-    Popover: ({ children }) => <div data-testid="popover">{typeof children === 'function' ? children({ close: vi.fn() }) : children}</div>,
-    PopoverButton: ({ children, onMouseEnter, ...props }) => (
-      <button onMouseEnter={onMouseEnter} {...props}>{children}</button>
-    ),
-    PopoverPanel: ({ children }) => <div data-testid="popover-panel">{children}</div>,
-    Dialog: ({ open, children }) => (open ? <div data-testid="dialog">{children}</div> : null),
-    DialogPanel: ({ children }) => <div>{children}</div>,
-    DialogTitle: ({ children }) => <h2>{children}</h2>,
-    Field: ({ children }) => <div>{children}</div>,
-    Label: ({ children }) => <label>{children}</label>,
-    Input: (props) => <input {...props} />,
-    Button: (props) => <button {...props} />,
-    // Mock Combobox to allow triggering changes
-    Combobox: ({ onChange, children }) => (
-      <div data-testid="combobox">
-        {children}
-        <button 
-          data-testid="mock-select-list" 
-          onClick={() => onChange({ id: 'list1', name: 'My List' })}
-        >
-          Select List
-        </button>
-        <button 
-          data-testid="mock-create-list-action" 
-          onClick={() => onChange({ action: 'create' })}
-        >
-          Create Action
-        </button>
-      </div>
-    ),
-    ComboboxInput: ({ onChange, ...props }) => (
-      <input 
-        data-testid="combobox-input" 
-        onChange={onChange} 
-        {...props} 
-      />
-    ),
-    ComboboxOptions: ({ children }) => <div>{children}</div>,
-    ComboboxOption: ({ children }) => <div>{children}</div>,
-  };
-});
+// Mock ListAddPopover
+vi.mock("../ListAddPopover", () => ({
+  default: ({ recipeId }) => (
+    <button data-testid="list-add-popover" data-recipe-id={recipeId}>
+      + Add
+    </button>
+  ),
+}));
 
 describe("RecipeCard", () => {
-  const mockGetComboboxLists = vi.fn();
-  const mockAddRecipeToList = vi.fn();
-  const mockCreateList = vi.fn();
-  const mockUpdateComboboxListTimestamp = vi.fn();
   const mockUser = { id: "user123" };
 
   const defaultContext = {
-    comboboxLists: [],
-    getComboboxLists: mockGetComboboxLists,
-    updateComboboxListTimestamp: mockUpdateComboboxListTimestamp,
-    canteenApi: {
-      addRecipeToList: mockAddRecipeToList,
-      createList: mockCreateList,
-    },
   };
 
   const mockRecipe = {
@@ -164,66 +115,14 @@ describe("RecipeCard", () => {
     expect(link).toHaveAttribute("href", "/applications/canteen/recipes/123");
   });
 
-  it("fetches combobox lists on hover of add button", () => {
+  it("renders the add to list popover", () => {
     render(
       <MemoryRouter>
         <RecipeCard recipe={mockRecipe} />
       </MemoryRouter>
     );
-    
-    const addBtn = screen.getByText("+ Add");
-    fireEvent.mouseEnter(addBtn);
-    
-    expect(mockGetComboboxLists).toHaveBeenCalledWith("user123");
-  });
-
-  it("adds recipe to an existing list", async () => {
-    render(
-      <MemoryRouter>
-        <RecipeCard recipe={mockRecipe} />
-      </MemoryRouter>
-    );
-
-    // Trigger selection via mock button
-    fireEvent.click(screen.getByTestId("mock-select-list"));
-
-    await waitFor(() => {
-      expect(mockAddRecipeToList).toHaveBeenCalledWith("list1", "123");
-    });
-
-    expect(screen.getByText("Added!")).toBeInTheDocument();
-  });
-
-  it("opens create list dialog and creates new list", async () => {
-    mockCreateList.mockResolvedValue({ id: "new-list-id", name: "New List" });
-
-    render(
-      <MemoryRouter>
-        <RecipeCard recipe={mockRecipe} />
-      </MemoryRouter>
-    );
-
-    // Simulate typing in combobox to set query
-    const input = screen.getByTestId("combobox-input");
-    fireEvent.change(input, { target: { value: "New List" } });
-
-    // Trigger create action via mock button
-    fireEvent.click(screen.getByTestId("mock-create-list-action"));
-
-    // Dialog should open
-    expect(screen.getByText("Create New List")).toBeInTheDocument();
-    
-    // Input should be pre-filled with query
-    const dialogInput = screen.getAllByDisplayValue("New List");
-    dialogInput.forEach(el => expect(el).toBeInTheDocument());
-
-    // Click Create & Add
-    fireEvent.click(screen.getByText("Create & Add"));
-
-    await waitFor(() => {
-      expect(mockCreateList).toHaveBeenCalledWith("New List");
-      expect(mockGetComboboxLists).toHaveBeenCalledWith("user123", "New List");
-      expect(mockAddRecipeToList).toHaveBeenCalledWith("new-list-id", "123");
-    });
+    const popover = screen.getByTestId("list-add-popover");
+    expect(popover).toBeInTheDocument();
+    expect(popover).toHaveAttribute("data-recipe-id", "123");
   });
 });
