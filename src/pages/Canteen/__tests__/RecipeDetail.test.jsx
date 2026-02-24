@@ -4,7 +4,6 @@ import RecipeDetail from "../RecipeDetail";
 import useData from "../../../context/data/useData";
 import useAuth from "../../../context/auth/useAuth";
 
-// Mock dependencies
 vi.mock("react-router-dom", () => ({
   useParams: () => ({ id: "123" }),
 }));
@@ -12,7 +11,6 @@ vi.mock("react-router-dom", () => ({
 vi.mock("../../../context/data/useData");
 vi.mock("../../../context/auth/useAuth");
 
-// Mock UI components to simplify DOM structure
 vi.mock("../../../components/MiddenCard", () => ({
   default: ({ children }) => <div data-testid="midden-card">{children}</div>,
 }));
@@ -29,7 +27,6 @@ vi.mock("../../../components/canteen/ListAddPopover", () => ({
   ),
 }));
 
-// Mock Headless UI Dialog to avoid portal issues in tests
 vi.mock("@headlessui/react", async () => {
   const actual = await vi.importActual("@headlessui/react");
   return {

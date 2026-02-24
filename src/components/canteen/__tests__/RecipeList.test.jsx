@@ -2,7 +2,6 @@ import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import RecipeList from "../RecipeList";
 
-// Mock RecipeCard to avoid needing Router context and to test isolation
 vi.mock("../RecipeCard", () => ({
   default: ({ recipe }) => <div data-testid="recipe-card">{recipe.title}</div>,
 }));

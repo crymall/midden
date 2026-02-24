@@ -11,9 +11,17 @@ global.ResizeObserver = class ResizeObserver {
   disconnect() {}
 };
 
-// Mock the hooks
 vi.mock("../../../context/data/useData");
 vi.mock("../../../context/auth/useAuth");
+vi.mock("../../MiddenModal", () => ({
+  default: ({ isOpen, title, children }) =>
+    isOpen ? (
+      <div role="dialog">
+        {title && <h2>{title}</h2>}
+        {children}
+      </div>
+    ) : null,
+}));
 
 describe("ListAddPopover", () => {
   const mockGetComboboxLists = vi.fn();
@@ -111,6 +119,33 @@ describe("ListAddPopover", () => {
 
       expect(mockAddRecipeToList).toHaveBeenCalledWith("list1", "recipe1");
       await waitFor(() => expect(mockHoistComboboxList).toHaveBeenCalledWith("list1"));
+    });
+
+    it("opens create modal and creates list", async () => {
+      useData.mockReturnValue({
+        ...baseData,
+        comboboxLists: [],
+      });
+
+      mockCreateList.mockResolvedValue({ id: "list3", name: "New List" });
+
+      render(<ListAddPopover recipeId="recipe1" />);
+      const button = screen.getByText("+ Add");
+      fireEvent.click(button);
+
+      const input = screen.getByPlaceholderText("Search or create list...");
+      fireEvent.change(input, { target: { value: "New List" } });
+
+      await screen.findByText('Create "New List"');
+      fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
+
+      expect(screen.getByText("Create New List")).toBeInTheDocument();
+
+      const submitButton = screen.getByText("Create & Add");
+      fireEvent.click(submitButton);
+
+      await waitFor(() => expect(mockCreateList).toHaveBeenCalledWith("New List"));
+      expect(mockAddRecipeToList).toHaveBeenCalledWith("list3", "recipe1");
     });
   });
 });

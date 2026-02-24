@@ -3,7 +3,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import RecipeFilter from "../RecipeFilter";
 import useData from "../../../context/data/useData";
 
-// Mock the useData hook
 vi.mock("../../../context/data/useData")
 
 describe("RecipeFilter", () => {

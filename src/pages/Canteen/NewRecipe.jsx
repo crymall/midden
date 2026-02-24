@@ -14,12 +14,10 @@ import {
   ComboboxInput,
   ComboboxOptions,
   ComboboxOption,
-  Dialog,
-  DialogPanel,
-  DialogTitle,
 } from "@headlessui/react";
 import useData from "../../context/data/useData";
 import MiddenCard from "../../components/MiddenCard";
+import MiddenModal from "../../components/MiddenModal";
 
 const NewRecipe = () => {
   const navigate = useNavigate();
@@ -487,17 +485,11 @@ const NewRecipe = () => {
         </div>
       </form>
 
-      <Dialog
-        open={isTagModalOpen}
+      <MiddenModal
+        isOpen={isTagModalOpen}
         onClose={() => setIsTagModalOpen(false)}
-        className="relative z-50"
+        title="Create New Tag"
       >
-        <div className="fixed inset-0 bg-black/70" aria-hidden="true" />
-        <div className="fixed inset-0 flex items-center justify-center p-4">
-          <DialogPanel className="bg-dark border-accent w-full max-w-md border-2 border-dashed p-6 shadow-xl">
-            <DialogTitle className="font-gothic mb-4 text-3xl text-white">
-              Create New Tag
-            </DialogTitle>
             <div className="flex flex-col gap-4">
               <Input
                 value={newTagName}
@@ -521,21 +513,13 @@ const NewRecipe = () => {
                 </Button>
               </div>
             </div>
-          </DialogPanel>
-        </div>
-      </Dialog>
+      </MiddenModal>
 
-      <Dialog
-        open={isIngredientModalOpen}
+      <MiddenModal
+        isOpen={isIngredientModalOpen}
         onClose={() => setIsIngredientModalOpen(false)}
-        className="relative z-50"
+        title="Create Ingredient"
       >
-        <div className="fixed inset-0 bg-black/70" aria-hidden="true" />
-        <div className="fixed inset-0 flex items-center justify-center p-4">
-          <DialogPanel className="bg-dark border-accent w-full max-w-md border-2 border-dashed p-6 shadow-xl">
-            <DialogTitle className="font-gothic mb-4 text-3xl text-white">
-              Create Ingredient
-            </DialogTitle>
             <p className="text-lightestGrey mb-6 font-mono">
               Are you sure you want to create the ingredient{" "}
               <span className="text-accent font-bold">
@@ -557,9 +541,7 @@ const NewRecipe = () => {
                 Create
               </Button>
             </div>
-          </DialogPanel>
-        </div>
-      </Dialog>
+      </MiddenModal>
     </MiddenCard>
   );
 };

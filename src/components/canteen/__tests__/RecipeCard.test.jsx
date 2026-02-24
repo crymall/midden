@@ -5,14 +5,12 @@ import RecipeCard from '../RecipeCard';
 import useData from "../../../context/data/useData";
 import useAuth from "../../../context/auth/useAuth";
 
-// Mock dependencies
 vi.mock("../../../context/data/useData");
 vi.mock("../../../context/auth/useAuth");
 vi.mock("../../gateways/Can", () => ({
   default: ({ children }) => <div data-testid="can-gate">{children}</div>,
 }));
 
-// Mock ListAddPopover
 vi.mock("../ListAddPopover", () => ({
   default: ({ recipeId }) => (
     <button data-testid="list-add-popover" data-recipe-id={recipeId}>

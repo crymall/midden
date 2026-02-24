@@ -1,9 +1,6 @@
 import { useState } from "react";
 import {
   Button,
-  Dialog,
-  DialogPanel,
-  DialogTitle,
   Field,
   Label,
   Input,
@@ -17,6 +14,7 @@ import {
 } from "@headlessui/react";
 import useData from "../../context/data/useData";
 import useAuth from "../../context/auth/useAuth";
+import MiddenModal from "../MiddenModal";
 
 const ListAddPopover = ({
   recipeId,
@@ -165,17 +163,11 @@ const ListAddPopover = ({
         )}
       </Popover>
 
-      <Dialog
-        open={isCreateListOpen}
+      <MiddenModal
+        isOpen={isCreateListOpen}
         onClose={() => setIsCreateListOpen(false)}
-        className="relative z-50"
+        title="Create New List"
       >
-        <div className="fixed inset-0 bg-black/70" aria-hidden="true" />
-        <div className="fixed inset-0 flex items-center justify-center p-4">
-          <DialogPanel className="bg-dark border-accent w-full max-w-md border-2 border-dashed p-6 shadow-xl">
-            <DialogTitle className="font-gothic mb-4 text-3xl text-white">
-              Create New List
-            </DialogTitle>
             <form onSubmit={handleCreateList} className="flex flex-col gap-4">
               <Field>
                 <Label className="text-lightestGrey mb-1 block text-sm font-bold">
@@ -204,9 +196,7 @@ const ListAddPopover = ({
                 </Button>
               </div>
             </form>
-          </DialogPanel>
-        </div>
-      </Dialog>
+      </MiddenModal>
     </>
   );
 };

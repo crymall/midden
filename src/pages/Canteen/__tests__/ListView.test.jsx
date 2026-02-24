@@ -5,11 +5,9 @@ import ListView from "../ListView";
 import useData from "../../../context/data/useData";
 import useAuth from "../../../context/auth/useAuth";
 
-// Mock dependencies
 vi.mock("../../../context/data/useData");
 vi.mock("../../../context/auth/useAuth");
 
-// Mock UI components
 vi.mock("../../../components/MiddenCard", () => ({
   default: ({ title, children }) => (
     <div data-testid="midden-card">

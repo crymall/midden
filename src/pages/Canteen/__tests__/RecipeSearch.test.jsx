@@ -3,10 +3,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import RecipeSearch from "../RecipeSearch";
 import useData from "../../../context/data/useData";
 
-// Mock dependencies
 vi.mock("../../../context/data/useData");
 
-// Mock child components to isolate RecipeSearch logic
 vi.mock("../../../components/MiddenCard", () => ({
   default: ({ title, children }) => (
     <div data-testid="midden-card">

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Button, Dialog, DialogPanel, Field, Label, Input, Select } from "@headlessui/react";
+import { Button, Field, Label, Input, Select } from "@headlessui/react";
 import useData from "../../context/data/useData";
 import useAuth from "../../context/auth/useAuth";
 import MiddenCard from "../../components/MiddenCard";
+import MiddenModal from "../../components/MiddenModal";
 
 const MyLists = () => {
   const { user } = useAuth();
@@ -14,6 +15,7 @@ const MyLists = () => {
   const [fetchingLists, setFetchingLists] = useState(true);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
+  const [listToDelete, setListToDelete] = useState(null);
 
   useEffect(() => {
     if (user) {
@@ -34,6 +36,22 @@ const MyLists = () => {
       console.error("Failed to create list", error);
     } finally {
       setCreatingList(false);
+    }
+  };
+
+  const handleDeleteList = (e, listId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setListToDelete(listId);
+  };
+
+  const confirmDeleteList = async () => {
+    try {
+      await canteenApi.deleteList(listToDelete);
+      await getUserLists(user.id, limit, (page - 1) * limit);
+      setListToDelete(null);
+    } catch (error) {
+      console.error("Failed to delete list", error);
     }
   };
 
@@ -75,15 +93,31 @@ const MyLists = () => {
             ...userLists.filter((l) => l.name === "Favorites"),
             ...userLists.filter((l) => l.name !== "Favorites"),
           ].map((list) => (
-            <Link
+            <div
               key={list.id}
-              to={`/applications/canteen/my-lists/${list.id}`}
-              className="group border-grey hover:border-accent flex flex-col border-2 border-dashed p-4 transition-colors"
+              className="group border-grey hover:border-accent relative flex flex-col border-2 border-dashed p-4 transition-colors"
             >
-              <h3 className="text-accent group-hover:text-white font-mono text-xl font-bold transition-colors">
-                {list.name}
-              </h3>
-            </Link>
+              <Link
+                to={`/applications/canteen/my-lists/${list.id}`}
+                className="absolute inset-0 z-0"
+              >
+                <span className="sr-only">View {list.name}</span>
+              </Link>
+              <div className="pointer-events-none relative z-10 flex items-start justify-between">
+                <h3 className="text-accent group-hover:text-white font-mono text-xl font-bold transition-colors">
+                  {list.name}
+                </h3>
+                {list.name !== "Favorites" && (
+                  <button
+                    onClick={(e) => handleDeleteList(e, list.id)}
+                    className="pointer-events-auto text-grey hover:text-red-400 z-20 font-bold transition-colors"
+                    aria-label={`Delete ${list.name}`}
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            </div>
           ))
         )}
       </div>
@@ -123,15 +157,11 @@ const MyLists = () => {
       </div>
 
       {/* Create List Modal */}
-      <Dialog
-        open={isCreateModalOpen}
+      <MiddenModal
+        isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        className="relative z-50"
+        title="Create New List"
       >
-        <div className="fixed inset-0 bg-black/70" aria-hidden="true" />
-        <div className="fixed inset-0 flex items-center justify-center p-4">
-          <DialogPanel className="bg-dark border-accent w-full max-w-md border-2 border-dashed p-6 shadow-xl">
-            <h3 className="font-gothic mb-4 text-3xl text-white">Create New List</h3>
             <form onSubmit={handleCreateList} className="flex flex-col gap-4">
               <Field>
                 <Label className="text-lightestGrey mb-1 block text-sm font-bold">
@@ -165,9 +195,32 @@ const MyLists = () => {
                 </Button>
               </div>
             </form>
-          </DialogPanel>
+      </MiddenModal>
+
+      {/* Delete List Modal */}
+      <MiddenModal
+        isOpen={!!listToDelete}
+        onClose={() => setListToDelete(null)}
+        title="Delete List"
+      >
+        <p className="text-lightestGrey mb-6 font-mono">
+          Are you sure you want to delete this list? This action cannot be undone.
+        </p>
+        <div className="flex justify-end gap-2">
+          <Button
+            onClick={() => setListToDelete(null)}
+            className="text-lightGrey px-4 py-2 font-bold hover:text-white"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={confirmDeleteList}
+            className="bg-red-500 hover:bg-red-600 px-4 py-2 font-bold text-white"
+          >
+            Delete
+          </Button>
         </div>
-      </Dialog>
+      </MiddenModal>
     </MiddenCard>
   );
 };

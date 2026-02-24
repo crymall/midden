@@ -5,11 +5,9 @@ import UserList from "../UserList";
 import useData from "../../context/data/useData";
 import useAuth from "../../context/auth/useAuth";
 
-// Mock the contexts
 vi.mock("../../context/data/useData");
 vi.mock("../../context/auth/useAuth");
 
-// Mock the roles constant since it's imported in the component
 vi.mock("../../utils/constants", () => ({
   ROLES: { Admin: 1, Editor: 2 },
 }));
