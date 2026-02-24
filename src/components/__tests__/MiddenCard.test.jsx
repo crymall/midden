@@ -3,11 +3,6 @@ import { describe, it, expect } from "vitest";
 import MiddenCard from "../MiddenCard";
 
 describe("MiddenCard Component", () => {
-  it("renders title when provided", () => {
-    render(<MiddenCard title="Test Title">Content</MiddenCard>);
-    expect(screen.getByRole("heading", { name: "Test Title" })).toBeInTheDocument();
-  });
-
   it("renders children content", () => {
     render(
       <MiddenCard>

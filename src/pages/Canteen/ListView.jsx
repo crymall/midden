@@ -27,7 +27,10 @@ const ListView = () => {
 
   if (!currentList && !recipesLoading) {
     return (
-      <MiddenCard title="List Not Found">
+      <MiddenCard>
+        <h2 className="mb-4 font-gothic text-4xl font-bold text-white">
+          List Not Found
+        </h2>
         <div className="flex flex-col items-center gap-4 p-8">
           <p className="text-lightGrey font-mono">
             The requested list could not be found.
@@ -44,7 +47,10 @@ const ListView = () => {
   }
 
   return (
-    <MiddenCard title={currentList?.name || "Loading List..."}>
+    <MiddenCard>
+      <h2 className="mb-4 font-gothic text-4xl font-bold text-white">
+        {currentList?.name || "Loading List..."}
+      </h2>
       <div className="mb-6 flex flex-col gap-2">
         <Link
           to="/applications/canteen/my-lists"

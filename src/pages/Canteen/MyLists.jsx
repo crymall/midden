@@ -67,13 +67,14 @@ const MyLists = () => {
   const baseInputClass = "bg-dark border-grey text-lightestGrey focus:border-lightestGrey border p-2 focus:outline-none w-full";
 
   return (
-    <MiddenCard title="My Lists">
-      <div className="mb-6 flex justify-end">
+    <MiddenCard>
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="font-gothic text-4xl font-bold text-white">My Lists</h2>
         <Button
           onClick={() => setIsCreateModalOpen(true)}
           className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-white transition-colors"
         >
-          + Create New List
+          +
         </Button>
       </div>
 

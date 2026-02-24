@@ -41,7 +41,10 @@ const RecipeSearch = () => {
   };
 
   return (
-    <MiddenCard title="Find Recipes">
+    <MiddenCard>
+      <h2 className="mb-4 font-gothic text-4xl font-bold text-white">
+        Find Recipes
+      </h2>
       <RecipeFilter onFilter={handleFilter} />
       <RecipeList recipes={recipes} loading={recipesLoading} />
 

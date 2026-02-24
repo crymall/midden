@@ -63,7 +63,7 @@ const Header = ({ user, logout, title, titleLink, navLinks }) => {
             <Button
               onClick={() => navigate("/settings")}
               aria-label="Settings"
-              className="bg-grey hover:bg-lightGrey text-dark px-3 py-1 text-2xl transition-colors"
+              className="bg-accent hover:bg-lightGrey text-dark px-3 py-1 text-2xl transition-colors"
             >
               🛠
             </Button>
@@ -72,7 +72,7 @@ const Header = ({ user, logout, title, titleLink, navLinks }) => {
                 logout();
               }}
               aria-label="Logout"
-              className="bg-grey hover:bg-lightGrey text-dark px-3 py-1 text-2xl transition-colors"
+              className="bg-accent hover:bg-lightGrey text-dark px-3 py-1 text-2xl transition-colors"
             >
               🚪→
             </Button>

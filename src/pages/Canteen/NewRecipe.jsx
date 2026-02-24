@@ -178,7 +178,10 @@ const NewRecipe = () => {
     "bg-dark border-grey text-lightestGrey focus:border-lightestGrey border p-2 focus:outline-none";
 
   return (
-    <MiddenCard title="New Recipe">
+    <MiddenCard>
+      <h2 className="mb-4 font-gothic text-4xl font-bold text-white">
+        New Recipe
+      </h2>
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         {error && (
           <div className="border border-red-500 bg-red-900/50 p-3 text-sm text-red-200">

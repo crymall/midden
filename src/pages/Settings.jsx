@@ -26,7 +26,10 @@ const Settings = () => {
   }, [fetchUsers, user]);
 
   return (
-    <MiddenCard title="Settings">
+    <MiddenCard>
+      <h2 className="mb-4 font-gothic text-4xl font-bold text-white">
+        Settings
+      </h2>
       <TabGroup>
         <TabList className="border-grey mb-6 flex space-x-4 border-b">
           <Tab className="data-selected:border-lightestGrey data-selected:text-lightestGrey text-grey hover:text-lightGrey cursor-pointer px-4 py-2 text-sm font-bold transition-colors focus:outline-none data-selected:border-b-2">

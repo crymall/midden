@@ -6,9 +6,8 @@ import useData from "../../../context/data/useData";
 vi.mock("../../../context/data/useData");
 
 vi.mock("../../../components/MiddenCard", () => ({
-  default: ({ title, children }) => (
+  default: ({ children }) => (
     <div data-testid="midden-card">
-      <h1>{title}</h1>
       {children}
     </div>
   ),
