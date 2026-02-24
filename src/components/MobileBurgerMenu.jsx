@@ -23,7 +23,7 @@ const MobileBurgerMenu = ({ showBack, navLinks }) => {
         <DialogPanel className="fixed inset-0 flex flex-col items-center justify-center bg-black p-4">
           <button
             onClick={() => setMobileMenuOpen(false)}
-            className="absolute top-4 right-4 font-mono text-4xl text-white hover:text-lightestGrey"
+            className="absolute top-4 right-4 font-gothic text-4xl text-white hover:text-lightestGrey"
           >
             X
           </button>

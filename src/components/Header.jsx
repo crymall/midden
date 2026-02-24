@@ -14,7 +14,7 @@ const Header = ({ user, logout, title, titleLink, navLinks }) => {
     <header className="bg-primary border-accent flex items-center justify-between border-b-4 border-dashed p-4">
       <div className="flex items-center gap-4">
         {/* Mobile: Burger Menu (if links exist) */}
-        <div className="md:hidden">
+        <div className="xl:hidden">
           {hasNav && (
             <MobileBurgerMenu showBack={showBack} navLinks={navLinks} />
           )}
@@ -28,7 +28,7 @@ const Header = ({ user, logout, title, titleLink, navLinks }) => {
         </h1>
 
         {hasNav && (
-          <nav className="ml-24 hidden items-center gap-16 md:flex">
+          <nav className="ml-24 hidden items-center gap-16 xl:flex">
             {navLinks.map((link) =>
               link.requiredPermission ? (
                 <Can key={link.to} perform={link.requiredPermission}>
