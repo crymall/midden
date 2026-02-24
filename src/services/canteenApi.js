@@ -101,16 +101,23 @@ export const createIngredient = async (name) => {
   return response.data;
 };
 
-export const fetchLists = async (limit, offset) => {
+export const fetchLists = async (limit, offset, name, sort, order) => {
   const response = await canteenApi.get("/lists", {
-    params: { limit, offset },
+    params: { limit, offset, name, sort, order },
   });
   return response.data;
 };
 
-export const fetchUserLists = async (userId, limit, offset) => {
+export const fetchUserLists = async (
+  userId,
+  limit,
+  offset,
+  name,
+  sort,
+  order,
+) => {
   const response = await canteenApi.get(`/lists/user/${userId}`, {
-    params: { limit, offset },
+    params: { limit, offset, name, sort, order },
   });
   return response.data;
 };

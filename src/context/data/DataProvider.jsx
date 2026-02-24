@@ -17,6 +17,9 @@ export const DataProvider = ({ children }) => {
   const [userLists, setUserLists] = useState([]);
   const [currentListRecipes, setCurrentListRecipes] = useState([]);
   const [comboboxLists, setComboboxLists] = useState([]);
+  const [comboboxListsLastFetched, setComboboxListsLastFetched] = useState(0);
+  const [currentComboboxQuery, setCurrentComboboxQuery] = useState("");
+  const [comboboxListsUserId, setComboboxListsUserId] = useState(null);
 
   const fetchUsers = useCallback(async () => {
     setUsersLoading(true);
@@ -133,20 +136,25 @@ export const DataProvider = ({ children }) => {
     try {
       const data = await canteenApi.fetchUserLists(userId, 10, 0, query, "updated_at", "DESC");
       setComboboxLists(data);
+      setComboboxListsUserId(userId);
+      setCurrentComboboxQuery(query);
+      if (!query) {
+        setComboboxListsLastFetched(Date.now());
+      }
     } catch (err) {
       console.error("Fetch combobox lists failed", err);
     }
   }, []);
 
-  const updateComboboxListTimestamp = useCallback((listId) => {
-    const now = new Date().toISOString();
+  const hoistComboboxList = useCallback((listId) => {
     setComboboxLists((prev) => {
-      if (prev.length === 0) return [];
+      const index = prev.findIndex((list) => list.id === listId);
+      if (index <= 0) return prev;
 
-      // Update the specific list's timestamp
-      return prev.map((list) =>
-        list.id === listId ? { ...list, updated_at: now } : list
-      );
+      const newLists = [...prev];
+      const [item] = newLists.splice(index, 1);
+      newLists.unshift(item);
+      return newLists;
     });
   }, []);
 
@@ -229,7 +237,10 @@ export const DataProvider = ({ children }) => {
         getListRecipes,
         comboboxLists,
         getComboboxLists,
-        updateComboboxListTimestamp,
+        comboboxListsLastFetched,
+        currentComboboxQuery,
+        comboboxListsUserId,
+        hoistComboboxList,
         currentListRecipes,
         toggleRecipeLike,
         createRecipe,

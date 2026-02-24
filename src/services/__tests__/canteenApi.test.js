@@ -140,16 +140,30 @@ describe("canteenApi", () => {
 
   describe("Lists", () => {
     it("fetchLists calls get", async () => {
+      await api.fetchLists(10, 0, "test", "name", "asc");
+      expect(mockGet).toHaveBeenCalledWith("/lists", {
+        params: { limit: 10, offset: 0, name: "test", sort: "name", order: "asc" },
+      });
+    });
+
+    it("fetchLists calls get with defaults", async () => {
       await api.fetchLists(10, 0);
       expect(mockGet).toHaveBeenCalledWith("/lists", {
-        params: { limit: 10, offset: 0 },
+        params: { limit: 10, offset: 0, name: undefined, sort: undefined, order: undefined },
       });
     });
 
     it("fetchUserLists calls get", async () => {
+      await api.fetchUserLists("u1", 10, 0, "test", "name", "asc");
+      expect(mockGet).toHaveBeenCalledWith("/lists/user/u1", {
+        params: { limit: 10, offset: 0, name: "test", sort: "name", order: "asc" },
+      });
+    });
+
+    it("fetchUserLists calls get with defaults", async () => {
       await api.fetchUserLists("u1", 10, 0);
       expect(mockGet).toHaveBeenCalledWith("/lists/user/u1", {
-        params: { limit: 10, offset: 0 },
+        params: { limit: 10, offset: 0, name: undefined, sort: undefined, order: undefined },
       });
     });
 

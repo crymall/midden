@@ -145,6 +145,7 @@ const MyLists = () => {
                   }
                   className={baseInputClass}
                   placeholder="e.g. Weeknight Dinners"
+                  autoFocus
                 />
               </Field>
               <div className="mt-4 flex justify-end gap-2">

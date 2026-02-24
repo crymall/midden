@@ -26,14 +26,27 @@ const ListAddPopover = ({
   label = "+ Add",
 }) => {
   const { user } = useAuth();
-  const { canteenApi, comboboxLists, getComboboxLists, updateComboboxListTimestamp } = useData();
+  const {
+    canteenApi,
+    comboboxLists,
+    getComboboxLists,
+    hoistComboboxList,
+    comboboxListsLastFetched,
+    currentComboboxQuery,
+    comboboxListsUserId,
+  } = useData();
   const [isCreateListOpen, setIsCreateListOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [newListName, setNewListName] = useState("");
   const [addListMessage, setAddListMessage] = useState("");
 
   const ensureListsLoaded = () => {
-    if (user && comboboxLists.length === 0) {
+    const STALE_TIME = 60 * 1000; // 1 minute
+    const isStale = Date.now() - comboboxListsLastFetched > STALE_TIME;
+    const isSearchData = currentComboboxQuery !== "";
+    const isDifferentUser = comboboxListsUserId !== user?.id;
+
+    if (user && (isStale || isSearchData || isDifferentUser)) {
       getComboboxLists(user.id);
     }
   };
@@ -53,9 +66,7 @@ const ListAddPopover = ({
     try {
       await canteenApi.addRecipeToList(listId, recipeId);
       setAddListMessage("Added!");
-
-      // Update context state to reflect the updated timestamp immediately across all components
-      updateComboboxListTimestamp(listId);
+      hoistComboboxList(listId);
 
       setTimeout(() => {
         setAddListMessage("");
@@ -98,12 +109,6 @@ const ListAddPopover = ({
     }
   };
 
-  const sortedLists = [...comboboxLists].sort((a, b) => {
-    const dateA = new Date(a.updated_at || a.created_at || 0);
-    const dateB = new Date(b.updated_at || b.created_at || 0);
-    return dateB - dateA;
-  });
-
   return (
     <>
       <Popover className={className}>
@@ -127,10 +132,11 @@ const ListAddPopover = ({
                   placeholder="Search or create list..."
                   onChange={handleQueryChange}
                   autoComplete="off"
+                  autoFocus
                 />
-                {(sortedLists.length > 0 || query.length > 0) && (
+                {(comboboxLists.length > 0 || query.length > 0) && (
                   <ComboboxOptions className="bg-dark border-grey absolute left-0 right-0 z-50 mt-1 max-h-40 overflow-auto border shadow-lg">
-                    {sortedLists.map((list) => (
+                    {comboboxLists.map((list) => (
                       <ComboboxOption
                         key={list.id}
                         value={list}
@@ -140,7 +146,7 @@ const ListAddPopover = ({
                       </ComboboxOption>
                     ))}
                     {query.length > 0 &&
-                      !sortedLists.some(
+                      !comboboxLists.some(
                         (l) =>
                           l.name.toLowerCase() === query.toLowerCase(),
                       ) && (
