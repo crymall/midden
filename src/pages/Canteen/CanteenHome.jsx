@@ -1,6 +1,7 @@
 import MiddenCard from "../../components/MiddenCard";
-import RecipeSearch from "./RecipeSearch";
 
+// This component is currently unused, but there is a future in which
+// it will be useful to tell the user what Canteen is all about.
 const CanteenHome = () => {
   return (
     <MiddenCard>

@@ -28,7 +28,7 @@ function App() {
               path="/applications/canteen"
               element={<Dashboard navMeta={navMeta.canteen} />}
             >
-              <Route index element={<CanteenHome />} />
+              <Route index element={<RecipeSearch />} />
               <Route path="recipes" element={<RecipeSearch />} />
               <Route path="recipes/:id" element={<RecipeDetail />} />
 
