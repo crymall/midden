@@ -7,7 +7,6 @@ const Header = ({ user, logout, title, titleLink, navLinks }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const isGuest = user && user.username === "guest";
-  const showBack = title !== "Midden";
   const hasNav = navLinks.length > 0;
 
   return (
@@ -16,7 +15,7 @@ const Header = ({ user, logout, title, titleLink, navLinks }) => {
         {/* Mobile: Burger Menu (if links exist) */}
         <div className="xl:hidden">
           {hasNav && (
-            <MobileBurgerMenu showBack={showBack} navLinks={navLinks} />
+            <MobileBurgerMenu navLinks={navLinks} />
           )}
         </div>
 

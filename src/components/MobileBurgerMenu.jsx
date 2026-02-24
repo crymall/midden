@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { Button, Dialog, DialogPanel } from "@headlessui/react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Can from "./gateways/Can";
 
-const MobileBurgerMenu = ({ showBack, navLinks }) => {
+const MobileBurgerMenu = ({ navLinks }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const navigate = useNavigate();
 
   return (
     <>
@@ -28,17 +27,6 @@ const MobileBurgerMenu = ({ showBack, navLinks }) => {
             X
           </button>
           <div className="flex flex-col items-center gap-8">
-            {showBack && (
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  navigate("/");
-                }}
-                className="font-gothic text-4xl text-white hover:text-lightestGrey transition-colors"
-              >
-                Back to Midden
-              </button>
-            )}
             {navLinks.map((link) =>
               link.requiredPermission ? (
                 <Can key={link.to} perform={link.requiredPermission}>

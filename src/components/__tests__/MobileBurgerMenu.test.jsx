@@ -21,7 +21,6 @@ vi.mock("../gateways/Can", () => ({
 
 describe("MobileBurgerMenu Component", () => {
   const defaultProps = {
-    showBack: false,
     navLinks: [],
   };
 
@@ -108,37 +107,5 @@ describe("MobileBurgerMenu Component", () => {
     await user.click(screen.getByText("≡"));
     expect(await screen.findByText("X")).toBeInTheDocument();
     expect(screen.queryByText("Restricted Link")).not.toBeInTheDocument();
-  });
-
-  it("renders 'Back to Midden' button when showBack is true and navigates on click", async () => {
-    const user = userEvent.setup();
-    render(
-      <MemoryRouter>
-        <MobileBurgerMenu {...defaultProps} showBack={true} />
-      </MemoryRouter>
-    );
-
-    await user.click(screen.getByText("≡"));
-    const backBtn = await screen.findByText("Back to Midden");
-    expect(backBtn).toBeInTheDocument();
-
-    await user.click(backBtn);
-    expect(mockNavigate).toHaveBeenCalledWith("/");
-    
-    await waitFor(() => {
-      expect(screen.queryByText("X")).not.toBeInTheDocument();
-    });
-  });
-
-  it("does not render 'Back to Midden' when showBack is false", async () => {
-    const user = userEvent.setup();
-    render(
-      <MemoryRouter>
-        <MobileBurgerMenu {...defaultProps} showBack={false} />
-      </MemoryRouter>
-    );
-
-    await user.click(screen.getByText("≡"));
-    expect(screen.queryByText("Back to Midden")).not.toBeInTheDocument();
   });
 });
