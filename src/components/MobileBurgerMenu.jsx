@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button, Dialog, DialogPanel } from "@headlessui/react";
 import { Link, useNavigate } from "react-router-dom";
+import Can from "./gateways/Can";
 
 const MobileBurgerMenu = ({ showBack, navLinks }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -38,17 +39,30 @@ const MobileBurgerMenu = ({ showBack, navLinks }) => {
                 Back to Midden
               </button>
             )}
-            {navLinks.map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                onClick={() => setMobileMenuOpen(false)}
-                aria-label={link.ariaLabel}
-                className="font-gothic text-4xl text-white hover:text-lightestGrey transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) =>
+              link.requiredPermission ? (
+                <Can key={link.to} perform={link.requiredPermission}>
+                  <Link
+                    to={link.to}
+                    onClick={() => setMobileMenuOpen(false)}
+                    aria-label={link.ariaLabel}
+                    className="font-gothic text-4xl text-white hover:text-lightestGrey transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </Can>
+              ) : (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  onClick={() => setMobileMenuOpen(false)}
+                  aria-label={link.ariaLabel}
+                  className="font-gothic text-4xl text-white hover:text-lightestGrey transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ),
+            )}
           </div>
         </DialogPanel>
       </Dialog>

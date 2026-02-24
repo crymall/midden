@@ -8,7 +8,9 @@ export const navMeta = {
   midden: {
     title: "Midden",
     titleLink: "/",
-    navLinks: [{ to: "/", label: "About", ariaLabel: "about" }],
+    navLinks: [
+      { to: "/", label: "About", ariaLabel: "about" },
+    ],
   },
   canteen: {
     title: "Canteen",
@@ -17,23 +19,26 @@ export const navMeta = {
       {
         to: "/applications/canteen/recipes",
         label: "Recipe Search",
-        ariaLabel: "recipe-search",
+        ariaLabel: "recipe-search"
       },
       {
         to: "/applications/canteen/recipes/new",
         label: "New Recipe",
         ariaLabel: "new-recipe",
+        requiredPermission: "write:canteen",
       },
       {
         to: "/applications/canteen/my-lists",
         label: "My Lists",
         ariaLabel: "my-lists",
+        requiredPermission: "write:canteen",
       },
       {
         to: "/",
         label: "Back to Midden",
         ariaLabel: "back-to-midden",
-      }
+        requireNotGuest: false,
+      },
     ],
   },
 };

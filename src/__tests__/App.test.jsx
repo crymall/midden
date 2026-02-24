@@ -37,7 +37,7 @@ describe("App Routing", () => {
   });
 
   it("redirects to login when accessing protected route unauthenticated", () => {
-    window.history.pushState({}, "Home", "/");
+    window.history.pushState({}, "Settings", "/settings");
     useAuth.mockReturnValue({ user: null });
     render(<App />);
     expect(screen.getByText("Login Page")).toBeInTheDocument();
@@ -58,13 +58,13 @@ describe("App Routing", () => {
     expect(screen.getByText("Settings Page")).toBeInTheDocument();
   });
 
-  it("redirects guest user from Settings to Home", () => {
+  it("redirects guest user from Settings to Login", () => {
     window.history.pushState({}, "Settings", "/settings");
     useAuth.mockReturnValue({ user: { username: "guest" } });
     render(<App />);
-    // Should redirect to / which renders Explorer
+    // Should redirect to /login
     expect(screen.queryByText("Settings Page")).not.toBeInTheDocument();
-    expect(screen.getByText("Explorer Page")).toBeInTheDocument();
+    expect(screen.getByText("Login Page")).toBeInTheDocument();
   });
 
   it("renders Experiments page", () => {

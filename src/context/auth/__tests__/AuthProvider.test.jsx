@@ -25,13 +25,16 @@ vi.mock("../../../services/iamApi", () => ({
 
 describe("AuthProvider", () => {
   const mockNavigate = vi.fn();
-  const mockLocation = { state: { from: { pathname: "/dashboard" } } };
+  const mockLocation = { pathname: "/dashboard", state: { from: { pathname: "/dashboard" } } };
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
     useNavigate.mockReturnValue(mockNavigate);
     useLocation.mockReturnValue(mockLocation);
     
+    // Default mock for login to prevent "undefined .then" errors in useEffect
+    iamApi.login.mockResolvedValue({});
+
     // Mock localStorage
     Object.defineProperty(window, "localStorage", {
       value: {
@@ -127,6 +130,9 @@ describe("AuthProvider", () => {
     window.localStorage.getItem.mockReturnValue(token);
     jwtDecode.mockReturnValue(decoded);
 
+    // Ensure auto-login doesn't return a token for this test so we can verify null state
+    iamApi.login.mockResolvedValue({});
+
     const wrapper = ({ children }) => <AuthProvider>{children}</AuthProvider>;
     const { result } = renderHook(() => useContext(AuthContext), { wrapper });
 
@@ -138,7 +144,10 @@ describe("AuthProvider", () => {
 
     expect(window.localStorage.removeItem).toHaveBeenCalledWith("token");
     expect(result.current.user).toBeNull();
-    expect(mockNavigate).toHaveBeenCalledWith("/login");
+    expect(mockNavigate).not.toHaveBeenCalledWith("/login");
+
+    // Since user is null and we are at /dashboard, auto-login should trigger
+    await waitFor(() => expect(iamApi.login).toHaveBeenCalledWith("guest", "guest"));
   });
   
   it("handles register", async () => {
@@ -152,5 +161,18 @@ describe("AuthProvider", () => {
     });
     
     expect(iamApi.register).toHaveBeenCalledWith("newuser", "email@test.com", "password");
+  });
+
+  it("automatically logs in as guest if no user and not on login page", async () => {
+    window.localStorage.getItem.mockReturnValue(null);
+    iamApi.login.mockResolvedValue({ token: "guest-token" });
+    jwtDecode.mockReturnValue({ username: "guest", exp: Date.now() / 1000 + 1000 });
+
+    const wrapper = ({ children }) => <AuthProvider>{children}</AuthProvider>;
+    const { result } = renderHook(() => useContext(AuthContext), { wrapper });
+
+    await waitFor(() => expect(result.current.user?.username).toBe("guest"));
+    expect(iamApi.login).toHaveBeenCalledWith("guest", "guest");
+    expect(window.localStorage.setItem).toHaveBeenCalledWith("token", "guest-token");
   });
 });

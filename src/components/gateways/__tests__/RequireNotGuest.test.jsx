@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter, Routes, Route } from "react-router-dom";
+import { MemoryRouter, Routes, Route, useLocation } from "react-router-dom";
 import { describe, it, expect, vi } from "vitest";
 import RequireNotGuest from "../RequireNotGuest";
 import useAuth from "../../../context/auth/useAuth";
@@ -23,35 +23,47 @@ describe("RequireNotGuest Gateway", () => {
     expect(screen.getByText("Restricted Content")).toBeInTheDocument();
   });
 
-  it("redirects to home if user is guest", () => {
+  it("redirects to login with state if user is guest", () => {
     useAuth.mockReturnValue({ user: { username: "guest" } });
+
+    const Login = () => {
+      const location = useLocation();
+      return (
+        <div>
+          Login Page
+          <span data-testid="from-state">{location.state?.from?.pathname}</span>
+        </div>
+      );
+    };
 
     render(
       <MemoryRouter initialEntries={["/restricted"]}>
         <Routes>
-          <Route path="/" element={<div>Home Page</div>} />
+          <Route path="/login" element={<Login />} />
           <Route element={<RequireNotGuest />}>
             <Route path="/restricted" element={<div>Restricted Content</div>} />
           </Route>
         </Routes>
       </MemoryRouter>
     );
-    expect(screen.getByText("Home Page")).toBeInTheDocument();
+    
+    expect(screen.getByText("Login Page")).toBeInTheDocument();
+    expect(screen.getByTestId("from-state")).toHaveTextContent("/restricted");
   });
 
-  it("redirects to home if user is null", () => {
+  it("redirects to login if user is null", () => {
     useAuth.mockReturnValue({ user: null });
 
     render(
       <MemoryRouter initialEntries={["/restricted"]}>
         <Routes>
-          <Route path="/" element={<div>Home Page</div>} />
+          <Route path="/login" element={<div>Login Page</div>} />
           <Route element={<RequireNotGuest />}>
             <Route path="/restricted" element={<div>Restricted Content</div>} />
           </Route>
         </Routes>
       </MemoryRouter>
     );
-    expect(screen.getByText("Home Page")).toBeInTheDocument();
+    expect(screen.getByText("Login Page")).toBeInTheDocument();
   });
 });

@@ -13,6 +13,12 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
+vi.mock("../gateways/Can", () => ({
+  default: ({ perform, children }) => {
+    return perform === "allowed" ? <>{children}</> : null;
+  },
+}));
+
 describe("MobileBurgerMenu Component", () => {
   const defaultProps = {
     showBack: false,
@@ -71,6 +77,37 @@ describe("MobileBurgerMenu Component", () => {
 
     await user.click(screen.getByText("≡"));
     expect(await screen.findByText("Test Link")).toBeInTheDocument();
+  });
+
+  it("renders restricted link when permission is allowed", async () => {
+    const navLinks = [
+      { to: "/restricted", label: "Restricted Link", requiredPermission: "allowed" },
+    ];
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <MobileBurgerMenu {...defaultProps} navLinks={navLinks} />
+      </MemoryRouter>
+    );
+
+    await user.click(screen.getByText("≡"));
+    expect(await screen.findByText("Restricted Link")).toBeInTheDocument();
+  });
+
+  it("does not render restricted link when permission is denied", async () => {
+    const navLinks = [
+      { to: "/restricted", label: "Restricted Link", requiredPermission: "denied" },
+    ];
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <MobileBurgerMenu {...defaultProps} navLinks={navLinks} />
+      </MemoryRouter>
+    );
+
+    await user.click(screen.getByText("≡"));
+    expect(await screen.findByText("X")).toBeInTheDocument();
+    expect(screen.queryByText("Restricted Link")).not.toBeInTheDocument();
   });
 
   it("renders 'Back to Midden' button when showBack is true and navigates on click", async () => {

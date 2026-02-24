@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import Login from "../Login";
 import useAuth from "../../context/auth/useAuth";
@@ -10,6 +11,7 @@ describe("Login Component", () => {
   const mockLogin = vi.fn();
   const mockVerifyLogin = vi.fn();
   const mockRegister = vi.fn();
+  const mockLogout = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -17,11 +19,17 @@ describe("Login Component", () => {
       login: mockLogin,
       verifyLogin: mockVerifyLogin,
       register: mockRegister,
+      logout: mockLogout,
+      user: null,
     });
   });
 
   it("renders login form by default", () => {
-    render(<Login />);
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
     expect(screen.getByRole("heading", { name: /log in/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
@@ -30,7 +38,11 @@ describe("Login Component", () => {
 
   it("switches to register mode", async () => {
     const user = userEvent.setup();
-    render(<Login />);
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
 
     const createAccountBtn = screen.getByRole("button", { name: /create account/i });
     await user.click(createAccountBtn);
@@ -44,7 +56,11 @@ describe("Login Component", () => {
     const user = userEvent.setup();
     mockLogin.mockResolvedValue({ token: "fake-token" });
 
-    render(<Login />);
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
 
     await user.type(screen.getByLabelText(/username/i), "testuser");
     await user.type(screen.getByLabelText(/password/i), "password123");
@@ -58,7 +74,11 @@ describe("Login Component", () => {
     // Simulate login response requiring 2FA (no token, but userId present)
     mockLogin.mockResolvedValue({ userId: "123", message: "Enter code" });
 
-    render(<Login />);
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
 
     await user.type(screen.getByLabelText(/username/i), "testuser");
     await user.type(screen.getByLabelText(/password/i), "password123");
@@ -70,16 +90,21 @@ describe("Login Component", () => {
     expect(screen.getByLabelText(/verification code/i)).toBeInTheDocument();
   });
 
-  it("handles guest login", async () => {
-    const user = userEvent.setup();
-    mockLogin.mockResolvedValue({ token: "guest-token" });
+  it("logs out guest user on mount", () => {
+    useAuth.mockReturnValue({
+      login: mockLogin,
+      verifyLogin: mockVerifyLogin,
+      register: mockRegister,
+      logout: mockLogout,
+      user: { username: "guest" },
+    });
 
-    render(<Login />);
-
-    const guestBtn = screen.getByRole("button", { name: /guest login/i });
-    await user.click(guestBtn);
-
-    expect(mockLogin).toHaveBeenCalledWith("guest", "guest");
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
+    expect(mockLogout).toHaveBeenCalled();
   });
 
   it("displays error message on login failure", async () => {
@@ -87,7 +112,11 @@ describe("Login Component", () => {
     const errorMsg = "Invalid credentials";
     mockLogin.mockRejectedValue({ response: { data: { error: errorMsg } } });
 
-    render(<Login />);
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
     await user.type(screen.getByLabelText(/username/i), "testuser");
     await user.type(screen.getByLabelText(/password/i), "password123");
     await user.click(screen.getByRole("button", { name: /^login$/i }));

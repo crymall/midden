@@ -10,8 +10,15 @@ vi.mock("react-router-dom", async () => {
   return {
     ...actual,
     useNavigate: () => mockNavigate,
+    useLocation: () => ({ pathname: "/current-page" }),
   };
 });
+
+vi.mock("../gateways/Can", () => ({
+  default: ({ perform, children }) => {
+    return perform === "allowed" ? <>{children}</> : null;
+  },
+}));
 
 describe("Header Component", () => {
   const mockLogout = vi.fn();
@@ -47,7 +54,7 @@ describe("Header Component", () => {
     expect(mockNavigate).toHaveBeenCalledWith("/settings");
   });
 
-  it("calls logout and navigates to login when logout button is clicked", async () => {
+  it("calls logout without navigating when logout button is clicked", async () => {
     const user = userEvent.setup();
     render(
       <MemoryRouter>
@@ -58,7 +65,7 @@ describe("Header Component", () => {
     const logoutBtn = screen.getByRole("button", { name: /logout/i });
     await user.click(logoutBtn);
     expect(mockLogout).toHaveBeenCalled();
-    expect(mockNavigate).toHaveBeenCalledWith("/login");
+    expect(mockNavigate).not.toHaveBeenCalledWith("/login");
   });
 
   it("does not show settings button for guest user", () => {
@@ -81,5 +88,44 @@ describe("Header Component", () => {
       </MemoryRouter>
     );
     expect(screen.getByText("Test Link")).toBeInTheDocument();
+  });
+
+  it("renders restricted link when permission is allowed", () => {
+    const navLinks = [
+      { to: "/restricted", label: "Restricted Link", requiredPermission: "allowed" },
+    ];
+    render(
+      <MemoryRouter>
+        <Header {...defaultProps} navLinks={navLinks} />
+      </MemoryRouter>
+    );
+    expect(screen.getByText("Restricted Link")).toBeInTheDocument();
+  });
+
+  it("does not render restricted link when permission is denied", () => {
+    const navLinks = [
+      { to: "/restricted", label: "Restricted Link", requiredPermission: "denied" },
+    ];
+    render(
+      <MemoryRouter>
+        <Header {...defaultProps} navLinks={navLinks} />
+      </MemoryRouter>
+    );
+    expect(screen.queryByText("Restricted Link")).not.toBeInTheDocument();
+  });
+
+  it("navigates to login with state when login button is clicked", async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <Header {...defaultProps} user={null} />
+      </MemoryRouter>
+    );
+
+    const loginBtn = screen.getByRole("button", { name: /login/i });
+    await user.click(loginBtn);
+    expect(mockNavigate).toHaveBeenCalledWith("/login", {
+      state: { from: { pathname: "/current-page" } },
+    });
   });
 });

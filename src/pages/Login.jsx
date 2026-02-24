@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Button, Field, Input, Label } from "@headlessui/react";
 import useAuth from "../context/auth/useAuth";
 
@@ -13,7 +14,13 @@ export default function Login() {
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
 
-  const { login, verifyLogin, register } = useAuth();
+  const { login, verifyLogin, register, user, logout } = useAuth();
+
+  useEffect(() => {
+    if (user && user.username === "guest") {
+      logout();
+    }
+  }, [user, logout]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,18 +51,6 @@ export default function Login() {
     setMode(mode === "login" ? "register" : "login");
     setError("");
     setInfo("");
-  };
-
-  const handleGuestLogin = async () => {
-    setError("");
-    setInfo("");
-    try {
-      const data = await login("guest", "guest");
-      if (data.token) return;
-      // Fallback if guest login somehow triggers 2FA flow
-    } catch (err) {
-      setError(err.response?.data?.error || "Guest login failed");
-    }
   };
 
   return (
@@ -175,13 +170,6 @@ export default function Login() {
                   className="text-lightestGrey mt-2 text-center text-sm underline hover:text-white"
                 >
                   Create Account
-                </button>
-                <button
-                  type="button"
-                  onClick={handleGuestLogin}
-                  className="text-lightestGrey text-center text-sm underline hover:text-white"
-                >
-                  Guest Login
                 </button>
               </>
             )}

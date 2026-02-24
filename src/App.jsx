@@ -11,7 +11,6 @@ import CanteenHome from "./pages/Canteen/CanteenHome";
 import RecipeSearch from "./pages/Canteen/RecipeSearch";
 import RecipeDetail from "./pages/Canteen/RecipeDetail";
 import NewRecipe from "./pages/Canteen/NewRecipe";
-import RequireAuth from "./components/gateways/RequireAuth";
 import RequireNotGuest from "./components/gateways/RequireNotGuest";
 import MyLists from "./pages/Canteen/MyLists";
 import ListView from "./pages/Canteen/ListView";
@@ -25,28 +24,30 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
 
-            <Route element={<RequireAuth />}>
-              <Route
-                path="/applications/canteen"
-                element={<Dashboard navMeta={navMeta.canteen} />}
-              >
-                <Route index element={<CanteenHome />} />
-                <Route path="recipes" element={<RecipeSearch />} />
+            <Route
+              path="/applications/canteen"
+              element={<Dashboard navMeta={navMeta.canteen} />}
+            >
+              <Route index element={<CanteenHome />} />
+              <Route path="recipes" element={<RecipeSearch />} />
+              <Route path="recipes/:id" element={<RecipeDetail />} />
+
+              <Route element={<RequireNotGuest />}>
                 <Route path="recipes/new" element={<NewRecipe />} />
-                <Route path="recipes/:id" element={<RecipeDetail />} />
                 <Route path="my-lists" element={<MyLists />} />
                 <Route path="my-lists/:id" element={<ListView />} />
-                <Route path="*" element={<NotFound />} />
               </Route>
 
-              <Route path="/" element={<Dashboard navMeta={navMeta.midden} />}>
-                <Route index element={<Explorer />} />
-                <Route element={<RequireNotGuest />}>
-                  <Route path="/settings" element={<Settings />} />
-                </Route>
-                <Route path="/experiments" element={<Experiments />} />
-                <Route path="*" element={<NotFound />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
+
+            <Route path="/" element={<Dashboard navMeta={navMeta.midden} />}>
+              <Route index element={<Explorer />} />
+              <Route path="/experiments" element={<Experiments />} />
+              <Route element={<RequireNotGuest />}>
+                <Route path="/settings" element={<Settings />} />
               </Route>
+              <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
         </DataProvider>
