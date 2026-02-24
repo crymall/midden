@@ -5,15 +5,6 @@ import NewRecipe from "../NewRecipe";
 import useData from "../../../context/data/useData";
 
 vi.mock("../../../context/data/useData");
-vi.mock("../../../components/MiddenModal", () => ({
-  default: ({ isOpen, title, children }) =>
-    isOpen ? (
-      <div role="dialog">
-        {title && <h2>{title}</h2>}
-        {children}
-      </div>
-    ) : null,
-}));
 
 const mockNavigate = vi.fn();
 vi.mock("react-router-dom", async () => {

@@ -13,15 +13,6 @@ global.ResizeObserver = class ResizeObserver {
 
 vi.mock("../../../context/data/useData");
 vi.mock("../../../context/auth/useAuth");
-vi.mock("../../MiddenModal", () => ({
-  default: ({ isOpen, title, children }) =>
-    isOpen ? (
-      <div role="dialog">
-        {title && <h2>{title}</h2>}
-        {children}
-      </div>
-    ) : null,
-}));
 
 describe("ListAddPopover", () => {
   const mockGetComboboxLists = vi.fn();
