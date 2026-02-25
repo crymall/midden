@@ -28,40 +28,78 @@ export default function Login() {
     setInfo("");
 
     try {
-      if (mode === "login") {
-        const data = await login(username, password);
-        if (data.token) return;
-        setUserId(data.userId);
-        setInfo(data.message || "Enter the code sent to your email.");
-        setMode("2fa");
-      } else if (mode === "2fa") {
-        await verifyLogin(userId, code);
-      } else if (mode === "register") {
-        await register(username, email, password);
-        setInfo("Registration successful! Please log in.");
-        setMode("login");
-        setPassword("");
+      switch (mode) {
+        case "login":
+          {
+            const data = await login(username, password);
+            if (data.token) return;
+            setUserId(data.userId);
+            setInfo(data.message || "Enter the code sent to your email.");
+            setMode("2fa");
+          }
+          break;
+        case "2fa":
+          await verifyLogin(userId, code);
+          break;
+        case "register":
+          await register(username, email, password);
+          setInfo("Registration successful! Please log in.");
+          setMode("login");
+          setPassword("");
+          break;
+        default:
+          break;
       }
     } catch (err) {
       setError(err.response?.data?.error || "An error occurred");
     }
   };
 
-  const toggleMode = () => {
-    setMode(mode === "login" ? "register" : "login");
+  const setCleanMode = (mode) => {
+    setMode(mode);
     setError("");
     setInfo("");
   };
+
+  const headerText =
+    mode === "2fa"
+      ? "2-Factor Verification"
+      : mode === "register"
+        ? "Create Account"
+        : "Log In";
+
+  const submitButtonText =
+    mode === "2fa" ? "Verify" : mode === "register" ? "Register" : "Login";
+
+  const pageInput = (label, placeholder, value, onInputChange) => (
+    <Field>
+      <Label className="mb-1 block text-sm font-bold">{label}</Label>
+      <Input
+        className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full border p-2 focus:outline-none"
+        type="text"
+        placeholder={placeholder}
+        required
+        value={value}
+        onChange={(e) => onInputChange(e.target.value)}
+      />
+    </Field>
+  );
+
+  const pageButton = (innerText, onClick = null) => (
+    <Button
+      type="button"
+      {...(onClick && { onClick })}
+      className="text-lightGrey text-sm underline hover:text-white"
+    >
+      {innerText}
+    </Button>
+  );
 
   return (
     <div className="bg-dark text-lightestGrey flex min-h-screen items-center justify-center font-mono">
       <div className="bg-primary md:border-accent flex min-h-screen w-full flex-col justify-center p-8 md:min-h-0 md:max-w-md md:border-4 md:border-dashed">
         <h1 className="font-gothic text-shadow-hard-grey mb-6 text-center text-4xl font-bold tracking-wide text-white">
-          {mode === "2fa"
-            ? "2-Factor Verification"
-            : mode === "register"
-              ? "Create Account"
-              : "Log In"}
+          {headerText}
         </h1>
 
         {error && (
@@ -77,58 +115,13 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-6 md:space-y-4">
           {mode === "2fa" ? (
-            <Field>
-              <Label className="mb-1 block text-sm font-bold">
-                Verification Code
-              </Label>
-              <Input
-                className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full border p-2 focus:outline-none"
-                type="text"
-                placeholder="123456"
-                required
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-              />
-            </Field>
+            pageInput("Verification Code", "123456", code, setCode)
           ) : (
             <>
-              <Field>
-                <Label className="mb-1 block text-sm font-bold">Username</Label>
-                <Input
-                  className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full border p-2 focus:outline-none"
-                  type="text"
-                  placeholder="Your username"
-                  required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-              </Field>
-
-              {mode === "register" && (
-                <Field>
-                  <Label className="mb-1 block text-sm font-bold">Email</Label>
-                  <Input
-                    className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full border p-2 focus:outline-none"
-                    type="email"
-                    placeholder="you@example.com"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </Field>
-              )}
-
-              <Field>
-                <Label className="mb-1 block text-sm font-bold">Password</Label>
-                <Input
-                  className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full border p-2 focus:outline-none"
-                  type="password"
-                  placeholder="Your password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </Field>
+              {pageInput("Username", "Your username", username, setUsername)}
+              {mode === "register" &&
+                pageInput("Email", "you@example.com", email, setEmail)}
+              {pageInput("Password", "Your password", password, setPassword)}
             </>
           )}
 
@@ -137,42 +130,16 @@ export default function Login() {
               type="submit"
               className="bg-grey hover:bg-lightGrey text-dark w-full px-4 py-2 font-bold transition-colors"
             >
-              {mode === "2fa"
-                ? "Verify"
-                : mode === "register"
-                  ? "Register"
-                  : "Login"}
+              {submitButtonText}
             </Button>
-            {mode === "register" && (
-              <Button
-                type="button"
-                onClick={toggleMode}
-                className="text-lightGrey text-sm underline hover:text-white"
-              >
-                Already have an account? Login
-              </Button>
-            )}
-            {mode === "2fa" && (
-              <Button
-                type="button"
-                onClick={() => setMode("login")}
-                className="text-lightGrey text-sm underline hover:text-white"
-              >
-                Back to Login
-              </Button>
-            )}
 
-            {mode === "login" && (
-              <>
-                <button
-                  type="button"
-                  onClick={toggleMode}
-                  className="text-lightestGrey mt-2 text-center text-sm underline hover:text-white"
-                >
-                  Create Account
-                </button>
-              </>
-            )}
+            {mode === "register" &&
+              pageButton("Already have an account? Login", () => setCleanMode("login"))}
+
+            {mode === "2fa" &&
+              pageButton("Back to Login", () => setCleanMode("login"))}
+
+            {mode === "login" && pageButton("Create Account", () => setCleanMode("register"))}
           </div>
         </form>
       </div>
