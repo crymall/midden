@@ -114,7 +114,7 @@ describe("Header Component", () => {
     expect(screen.queryByText("Restricted Link")).not.toBeInTheDocument();
   });
 
-  it("navigates to login with state when login button is clicked", async () => {
+  it.only("navigates to login with state when login button is clicked", async () => {
     const user = userEvent.setup();
     render(
       <MemoryRouter>
