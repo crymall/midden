@@ -177,6 +177,50 @@ const NewRecipe = () => {
   const baseInputClass =
     "bg-dark border-grey text-lightestGrey focus:border-lightestGrey border p-2 focus:outline-none";
 
+  const renderField = (
+    label,
+    name,
+    type = "text",
+    className = "",
+    props = {},
+  ) => (
+    <Field className={className}>
+      <Label className="text-lightestGrey mb-1 block text-sm font-bold">
+        {label}
+      </Label>
+      <Input
+        name={name}
+        type={type}
+        value={formData[name]}
+        onChange={handleChange}
+        className={`${baseInputClass} w-full`}
+        {...props}
+      />
+    </Field>
+  );
+
+  const renderTextarea = (
+    label,
+    name,
+    rows = 3,
+    className = "",
+    placeholder = "",
+  ) => (
+    <Field className={className}>
+      <Label className="text-lightestGrey mb-1 block text-sm font-bold">
+        {label}
+      </Label>
+      <Textarea
+        name={name}
+        value={formData[name]}
+        onChange={handleChange}
+        rows={rows}
+        className={`${baseInputClass} w-full`}
+        placeholder={placeholder}
+      />
+    </Field>
+  );
+
   return (
     <MiddenCard>
       <h2 className="mb-4 font-gothic text-4xl font-bold text-white">
@@ -190,75 +234,20 @@ const NewRecipe = () => {
         )}
 
         <div className="grid gap-6 md:grid-cols-2">
-          <Field className="md:col-span-2">
-            <Label className="text-lightestGrey mb-1 block text-sm font-bold">
-              Title
-            </Label>
-            <Input
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              required
-              className={`${baseInputClass} w-full`}
-            />
-          </Field>
-
-          <Field className="md:col-span-2">
-            <Label className="text-lightestGrey mb-1 block text-sm font-bold">
-              Description
-            </Label>
-            <Textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              rows={3}
-              className={`${baseInputClass} w-full`}
-            />
-          </Field>
-
-          <Field>
-            <Label className="text-lightestGrey mb-1 block text-sm font-bold">
-              Prep Time (minutes)
-            </Label>
-            <Input
-              type="number"
-              name="prep_time_minutes"
-              value={formData.prep_time_minutes}
-              onChange={handleChange}
-              className={`${baseInputClass} w-full`}
-              min="0"
-            />
-          </Field>
-
-          <Field>
-            <Label className="text-lightestGrey mb-1 block text-sm font-bold">
-              Cook Time (minutes)
-            </Label>
-            <Input
-              type="number"
-              name="cook_time_minutes"
-              value={formData.cook_time_minutes}
-              onChange={handleChange}
-              className={`${baseInputClass} w-full`}
-              min="0"
-            />
-          </Field>
-
-          <Field>
-            <Label className="text-lightestGrey mb-1 block text-sm font-bold">
-              Servings
-            </Label>
-            <Input
-              type="number"
-              name="servings"
-              value={formData.servings}
-              onChange={handleChange}
-              className={`${baseInputClass} w-full`}
-              min="0"
-              step="any"
-            />
-          </Field>
-
+          {renderField("Title", "title", "text", "md:col-span-2", {
+            required: true,
+          })}
+          {renderTextarea("Description", "description", 3, "md:col-span-2")}
+          {renderField("Prep Time (minutes)", "prep_time_minutes", "number", "", {
+            min: "0",
+          })}
+          {renderField("Cook Time (minutes)", "cook_time_minutes", "number", "", {
+            min: "0",
+          })}
+          {renderField("Servings", "servings", "number", "", {
+            min: "0",
+            step: "any",
+          })}
           <Field>
             <Label className="text-lightestGrey mb-1 block text-sm font-bold">
               Tags
@@ -456,19 +445,7 @@ const NewRecipe = () => {
           </div>
         </div>
 
-        <Field>
-          <Label className="text-lightestGrey mb-1 block text-sm font-bold">
-            Instructions
-          </Label>
-          <Textarea
-            name="instructions"
-            value={formData.instructions}
-            onChange={handleChange}
-            rows={10}
-            className={`${baseInputClass} w-full`}
-            placeholder="Step 1: ..."
-          />
-        </Field>
+        {renderTextarea("Instructions", "instructions", 10, "", "Step 1: ...")}
 
         <div className="flex justify-end gap-4 pt-4">
           <Button
