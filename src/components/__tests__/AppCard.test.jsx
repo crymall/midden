@@ -20,7 +20,6 @@ describe("AppCard Component", () => {
     expect(link).toHaveAttribute("href", "/internal");
     expect(screen.getByText("🍎")).toBeInTheDocument();
     expect(screen.getByText("Apple")).toBeInTheDocument();
-    expect(screen.getByText("A")).toBeInTheDocument();
   });
 
   it("renders an external link correctly", () => {
@@ -33,17 +32,6 @@ describe("AppCard Component", () => {
     expect(link).toHaveAttribute("href", "https://example.com");
     expect(link).toHaveAttribute("target", "_blank");
     expect(link).toHaveAttribute("rel", "noopener noreferrer");
-  });
-
-  it("applies small styles when small prop is true", () => {
-    render(
-      <MemoryRouter>
-        <AppCard {...defaultProps} small={true} />
-      </MemoryRouter>
-    );
-    const link = screen.getByRole("link");
-    expect(link).toHaveClass("w-15");
-    expect(link).not.toHaveClass("md:w-46");
   });
 
   it("renders description with correct visibility and default alignment", () => {
@@ -65,14 +53,15 @@ describe("AppCard Component", () => {
 
   it("aligns description to the right when card is on the right side of screen", () => {
     const description = "banana";
-    render(
+    window.innerWidth = 1024;
+    const { container } = render(
       <MemoryRouter>
         <AppCard {...defaultProps} description={description} />
       </MemoryRouter>
     );
 
-    const card = screen.getByRole("link");
-    // Mock getBoundingClientRect. JSDOM window.innerWidth defaults to 1024.
+    const card = container.firstChild;
+    // Mock getBoundingClientRect
     card.getBoundingClientRect = vi.fn(() => ({ left: 600 }));
 
     fireEvent.mouseEnter(card);
@@ -83,14 +72,25 @@ describe("AppCard Component", () => {
     expect(wrapper).not.toHaveClass("left-0");
   });
 
-  it("renders initials and full label with responsive classes", () => {
+  it("renders mobile description toggle and expands on click", () => {
+    const description = "banana";
     render(
       <MemoryRouter>
-        <AppCard {...defaultProps} label="Hello World" />
+        <AppCard {...defaultProps} description={description} />
       </MemoryRouter>
     );
 
-    expect(screen.getByText("HW")).toHaveClass("sm:hidden");
-    expect(screen.getByText("Hello World")).toHaveClass("hidden sm:inline");
+    // Toggle button should be present (visible on mobile via CSS)
+    const toggleBtn = screen.getByRole("button", { name: /expand description/i });
+    expect(toggleBtn).toBeInTheDocument();
+
+    // Click to expand
+    fireEvent.click(toggleBtn);
+    expect(screen.getByRole("button", { name: /collapse description/i })).toBeInTheDocument();
+
+    // Description text should be visible in the mobile container
+    // (We check for the text, and we know the desktop one is hidden by default classes)
+    const descriptions = screen.getAllByText(description);
+    expect(descriptions.length).toBeGreaterThan(0);
   });
 });

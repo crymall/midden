@@ -19,17 +19,4 @@ describe("AppGrid Component", () => {
     expect(screen.getByRole("link", { name: "App 1" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "App 2" })).toBeInTheDocument();
   });
-
-  it("passes small prop to AppCards", () => {
-    render(
-      <MemoryRouter>
-        <AppGrid items={items} small={true} />
-      </MemoryRouter>
-    );
-    
-    const links = screen.getAllByRole("link");
-    links.forEach(link => {
-      expect(link).toHaveClass("w-15");
-    });
-  });
 });

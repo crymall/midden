@@ -1,10 +1,10 @@
 import AppCard from "./AppCard";
 
-const AppGrid = ({ items = [], small = false }) => {
+const AppGrid = ({ items = [] }) => {
   return (
-    <div className="flex w-full flex-wrap gap-6">
+    <div className="flex w-full flex-col gap-4 sm:flex-row sm:flex-wrap sm:gap-6">
       {items.map((item, index) => (
-        <AppCard key={index} small={small} {...item} />
+        <AppCard key={index} {...item} />
       ))}
     </div>
   );
