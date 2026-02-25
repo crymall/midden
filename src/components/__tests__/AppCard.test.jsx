@@ -20,6 +20,7 @@ describe("AppCard Component", () => {
     expect(link).toHaveAttribute("href", "/internal");
     expect(screen.getByText("🍎")).toBeInTheDocument();
     expect(screen.getByText("Apple")).toBeInTheDocument();
+    expect(screen.getByText("A")).toBeInTheDocument();
   });
 
   it("renders an external link correctly", () => {
@@ -41,7 +42,7 @@ describe("AppCard Component", () => {
       </MemoryRouter>
     );
     const link = screen.getByRole("link");
-    expect(link).toHaveClass("w-20");
+    expect(link).toHaveClass("w-15");
     expect(link).not.toHaveClass("md:w-46");
   });
 
@@ -54,5 +55,16 @@ describe("AppCard Component", () => {
     );
     
     expect(screen.getByText(description)).toBeInTheDocument();
+  });
+
+  it("renders initials and full label with responsive classes", () => {
+    render(
+      <MemoryRouter>
+        <AppCard {...defaultProps} label="Hello World" />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText("HW")).toHaveClass("sm:hidden");
+    expect(screen.getByText("Hello World")).toHaveClass("hidden sm:inline");
   });
 });

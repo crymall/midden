@@ -5,8 +5,9 @@ const AppCard = ({ to, symbol, label, small = false, description }) => {
   const isExternal = to.startsWith("http");
   const className = clsx(
     "relative group aspect-square text-white flex flex-col items-center hover:bg-opacity-90 transition-all hover:z-50",
-    small ? "w-20 sm:w-36" : "w-20 sm:w-36 md:w-46",
+    small ? "w-15 sm:w-36" : "w-15 sm:w-36 md:w-46",
   );
+  const initials = label === "Back" ? "" : label.split(" ").map((word) => word[0]).join("");
 
   const content = (
     <>
@@ -26,7 +27,8 @@ const AppCard = ({ to, symbol, label, small = false, description }) => {
               : "text-xs sm:text-sm md:text-base",
           )}
         >
-          {label}
+          <span className="sm:hidden">{initials}</span>
+          <span className="hidden sm:inline">{label}</span>
         </span>
       </div>
       {description && (
