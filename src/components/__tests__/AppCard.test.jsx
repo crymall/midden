@@ -1,6 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import AppCard from "../AppCard";
 
 describe("AppCard Component", () => {
@@ -46,7 +46,7 @@ describe("AppCard Component", () => {
     expect(link).not.toHaveClass("md:w-46");
   });
 
-  it("renders description when provided", () => {
+  it("renders description with correct visibility and default alignment", () => {
     const description = "banana";
     render(
       <MemoryRouter>
@@ -54,7 +54,33 @@ describe("AppCard Component", () => {
       </MemoryRouter>
     );
     
-    expect(screen.getByText(description)).toBeInTheDocument();
+    const descText = screen.getByText(description);
+    expect(descText).toBeInTheDocument();
+
+    const wrapper = descText.closest("div");
+    expect(wrapper).toHaveClass("hidden");
+    expect(wrapper).toHaveClass("sm:block");
+    expect(wrapper).toHaveClass("left-0");
+  });
+
+  it("aligns description to the right when card is on the right side of screen", () => {
+    const description = "banana";
+    render(
+      <MemoryRouter>
+        <AppCard {...defaultProps} description={description} />
+      </MemoryRouter>
+    );
+
+    const card = screen.getByRole("link");
+    // Mock getBoundingClientRect. JSDOM window.innerWidth defaults to 1024.
+    card.getBoundingClientRect = vi.fn(() => ({ left: 600 }));
+
+    fireEvent.mouseEnter(card);
+
+    const wrapper = screen.getByText(description).closest("div");
+    expect(wrapper).toHaveClass("right-0");
+    expect(wrapper).toHaveClass("translate-x-4");
+    expect(wrapper).not.toHaveClass("left-0");
   });
 
   it("renders initials and full label with responsive classes", () => {

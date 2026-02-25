@@ -1,13 +1,30 @@
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import clsx from "clsx";
 
 const AppCard = ({ to, symbol, label, small = false, description }) => {
+  const [alignRight, setAlignRight] = useState(false);
+  const cardRef = useRef(null);
+
+  const handleMouseEnter = () => {
+    if (cardRef.current) {
+      const rect = cardRef.current.getBoundingClientRect();
+      setAlignRight(rect.left > window.innerWidth / 2);
+    }
+  };
+
   const isExternal = to.startsWith("http");
   const className = clsx(
     "relative group aspect-square text-white flex flex-col items-center hover:bg-opacity-90 transition-all hover:z-50",
     small ? "w-15 sm:w-36" : "w-15 sm:w-36 md:w-46",
   );
-  const initials = label === "Back" ? "" : label.split(" ").map((word) => word[0]).join("");
+  const initials =
+    label === "Back"
+      ? ""
+      : label
+          .split(" ")
+          .map((word) => word[0])
+          .join("");
 
   const content = (
     <>
@@ -22,9 +39,7 @@ const AppCard = ({ to, symbol, label, small = false, description }) => {
         <span
           className={clsx(
             "text-center leading-tight tracking-wider",
-            small
-              ? "text-xs sm:text-sm"
-              : "text-xs sm:text-sm md:text-base",
+            small ? "text-xs sm:text-sm" : "text-xs sm:text-sm md:text-base",
           )}
         >
           <span className="sm:hidden">{initials}</span>
@@ -32,8 +47,15 @@ const AppCard = ({ to, symbol, label, small = false, description }) => {
         </span>
       </div>
       {description && (
-        <div className="bg-lightGrey border-accent pointer-events-none absolute top-full left-0 z-50 w-[170%] -translate-x-4 border-4 border-dashed p-4 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
-          <p className="text-md text-dark text-left font-mono">{description}</p>
+        <div
+          className={clsx(
+            "bg-lightGrey border-accent pointer-events-none absolute top-full z-50 hidden w-[170%] border-4 border-dashed p-4 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 sm:block md:-mt-4",
+            alignRight ? "right-0 translate-x-4" : "left-0 -translate-x-4",
+          )}
+        >
+          <p className="md:text-base text-dark text-left font-mono text-sm">
+            {description}
+          </p>
         </div>
       )}
     </>
@@ -42,6 +64,8 @@ const AppCard = ({ to, symbol, label, small = false, description }) => {
   if (isExternal) {
     return (
       <a
+        ref={cardRef}
+        onMouseEnter={handleMouseEnter}
         href={to}
         className={className}
         aria-label={label}
@@ -54,7 +78,13 @@ const AppCard = ({ to, symbol, label, small = false, description }) => {
   }
 
   return (
-    <Link to={to} className={className} aria-label={label}>
+    <Link
+      ref={cardRef}
+      onMouseEnter={handleMouseEnter}
+      to={to}
+      className={className}
+      aria-label={label}
+    >
       {content}
     </Link>
   );
