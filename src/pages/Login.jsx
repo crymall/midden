@@ -71,12 +71,12 @@ export default function Login() {
   const submitButtonText =
     mode === "2fa" ? "Verify" : mode === "register" ? "Register" : "Login";
 
-  const pageInput = (label, placeholder, value, onInputChange) => (
+  const pageInput = (label, type, placeholder, value, onInputChange) => (
     <Field>
       <Label className="mb-1 block text-sm font-bold">{label}</Label>
       <Input
         className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full border p-2 focus:outline-none"
-        type="text"
+        type={type}
         placeholder={placeholder}
         required
         value={value}
@@ -115,13 +115,13 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-6 md:space-y-4">
           {mode === "2fa" ? (
-            pageInput("Verification Code", "123456", code, setCode)
+            pageInput("Verification Code", "text", "123456", code, setCode)
           ) : (
             <>
-              {pageInput("Username", "Your username", username, setUsername)}
+              {pageInput("Username", "text", "Your username", username, setUsername)}
               {mode === "register" &&
-                pageInput("Email", "you@example.com", email, setEmail)}
-              {pageInput("Password", "Your password", password, setPassword)}
+                pageInput("Email", "email", "you@example.com", email, setEmail)}
+              {pageInput("Password", "password", "Your password", password, setPassword)}
             </>
           )}
 
