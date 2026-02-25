@@ -4,6 +4,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import Settings from "../Settings";
 import useAuth from "../../context/auth/useAuth";
 import useData from "../../context/data/useData";
+import { PERMISSIONS } from "../../utils/constants";
 
 // Mock the contexts
 vi.mock("../../context/auth/useAuth");
@@ -52,7 +53,7 @@ describe("Settings Component", () => {
 
   it("shows Admin Panel tab with permissions and fetches users", () => {
     useAuth.mockReturnValue({
-      user: { username: "admin", permissions: ["read:users"] },
+      user: { username: "admin", permissions: [PERMISSIONS.readUsers] },
     });
 
     render(<Settings />);
@@ -64,7 +65,7 @@ describe("Settings Component", () => {
   it("switches to Admin Panel when tab is clicked", async () => {
     const user = userEvent.setup();
     useAuth.mockReturnValue({
-      user: { username: "admin", permissions: ["read:users"] },
+      user: { username: "admin", permissions: [PERMISSIONS.readUsers] },
     });
 
     render(<Settings />);

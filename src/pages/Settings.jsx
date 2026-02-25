@@ -14,16 +14,19 @@ import useData from "../context/data/useData";
 import UserList from "../components/UserList";
 import Can from "../components/gateways/Can";
 import MiddenCard from "../components/MiddenCard";
+import { PERMISSIONS } from "../utils/constants";
 
 const Settings = () => {
   const { user } = useAuth();
   const { fetchUsers } = useData();
+  const { readUsers } = PERMISSIONS;
+
 
   useEffect(() => {
-    if (user && user.permissions.includes("read:users")) {
+    if (user && user.permissions.includes(readUsers)) {
       fetchUsers();
     }
-  }, [fetchUsers, user]);
+  }, [fetchUsers, user, readUsers]);
 
   return (
     <MiddenCard>
@@ -35,7 +38,7 @@ const Settings = () => {
           <Tab className="data-selected:border-lightestGrey data-selected:text-lightestGrey text-grey hover:text-lightGrey cursor-pointer px-4 py-2 text-sm font-bold transition-colors focus:outline-none data-selected:border-b-2">
             Profile
           </Tab>
-          <Can perform="read:users">
+          <Can perform={readUsers}>
             <Tab className="data-selected:border-lightestGrey data-selected:text-lightestGrey text-grey hover:text-lightGrey cursor-pointer px-4 py-2 text-sm font-bold transition-colors focus:outline-none data-selected:border-b-2">
               Admin Panel
             </Tab>
@@ -71,7 +74,7 @@ const Settings = () => {
             </div>
           </TabPanel>
 
-          <Can perform="read:users">
+          <Can perform={readUsers}>
             <TabPanel>
               <h2 className="mb-4 font-mono text-xl font-bold text-white">
                 User Admin

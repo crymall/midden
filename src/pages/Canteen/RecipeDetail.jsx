@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Button } from "@headlessui/react";
 import useData from "../../context/data/useData";
@@ -6,6 +6,7 @@ import useAuth from "../../context/auth/useAuth";
 import MiddenCard from "../../components/MiddenCard";
 import Can from "../../components/gateways/Can";
 import ListAddPopover from "../../components/canteen/ListAddPopover";
+import { PERMISSIONS } from "../../utils/constants";
 
 const RecipeDetail = () => {
   const { id } = useParams();
@@ -91,7 +92,7 @@ const RecipeDetail = () => {
                 ))}
               </div>
             </div>
-            <Can perform="write:canteen">
+            <Can perform={PERMISSIONS.writeCanteen}>
               <div className="flex gap-2">
                 <Button
                   onClick={handleLike}

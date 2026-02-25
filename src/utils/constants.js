@@ -4,6 +4,13 @@ export const ROLES = {
   Viewer: 3,
 };
 
+export const PERMISSIONS = {
+  readUsers: "read:users",
+  writeUsers: "write:users",
+  readCanteen: "read:canteen",
+  writeCanteen: "write:canteen",
+}
+
 export const navMeta = {
   midden: {
     title: "Midden",
@@ -25,13 +32,13 @@ export const navMeta = {
         to: "/applications/canteen/recipes/new",
         label: "New Recipe",
         ariaLabel: "new-recipe",
-        requiredPermission: "write:canteen",
+        requiredPermission: PERMISSIONS.writeCanteen,
       },
       {
         to: "/applications/canteen/my-lists",
         label: "My Lists",
         ariaLabel: "my-lists",
-        requiredPermission: "write:canteen",
+        requiredPermission: PERMISSIONS.writeCanteen,
       },
       {
         to: "/",
@@ -56,7 +63,7 @@ export const explorerLinkList = [
   },
 ];
 
-export const experimentList = [
+export const experimentLinkList = [
   {
     label: "Back",
     symbol: "⬅️",

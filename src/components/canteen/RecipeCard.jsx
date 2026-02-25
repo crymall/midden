@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import Can from "../gateways/Can";
 import ListAddPopover from "./ListAddPopover";
+import { PERMISSIONS } from "../../utils/constants";
 
 const RecipeCard = ({ recipe }) => {
 
@@ -49,7 +50,7 @@ const RecipeCard = ({ recipe }) => {
             </span>
           ))}
         </div>
-        <Can perform="write:canteen">
+        <Can perform={PERMISSIONS.writeCanteen}>
           <ListAddPopover
             recipeId={recipe.id}
             className="pointer-events-auto relative z-20"
