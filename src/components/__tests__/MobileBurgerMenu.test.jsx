@@ -108,4 +108,25 @@ describe("MobileBurgerMenu Component", () => {
     expect(await screen.findByText("X")).toBeInTheDocument();
     expect(screen.queryByText("Restricted Link")).not.toBeInTheDocument();
   });
+
+  it("closes the menu after navigation", async () => {
+    const navLinks = [
+      { to: "/destination", label: "Go There", ariaLabel: "Go There" },
+    ];
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <MobileBurgerMenu {...defaultProps} navLinks={navLinks} />
+      </MemoryRouter>
+    );
+
+    await user.click(screen.getByText("≡"));
+    expect(await screen.findByText("X")).toBeInTheDocument();
+
+    await user.click(screen.getByText("Go There"));
+
+    await waitFor(() => {
+      expect(screen.queryByText("X")).not.toBeInTheDocument();
+    });
+  });
 });

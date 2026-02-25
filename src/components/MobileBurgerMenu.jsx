@@ -1,10 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect, useEffectEvent } from "react";
 import { Button, Dialog, DialogPanel } from "@headlessui/react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Can from "./gateways/Can";
 
 const MobileBurgerMenu = ({ navLinks }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
+
+  const setMenuClosedEvent = useEffectEvent(() => {
+    setMobileMenuOpen(false);
+  });
+
+  useEffect(() => {
+    setMenuClosedEvent();
+  }, [location]);
 
   return (
     <>
@@ -32,7 +41,6 @@ const MobileBurgerMenu = ({ navLinks }) => {
                 <Can key={link.to} perform={link.requiredPermission}>
                   <Link
                     to={link.to}
-                    onClick={() => setMobileMenuOpen(false)}
                     aria-label={link.ariaLabel}
                     className="font-gothic text-4xl text-white hover:text-lightestGrey transition-colors"
                   >
@@ -43,7 +51,6 @@ const MobileBurgerMenu = ({ navLinks }) => {
                 <Link
                   key={link.to}
                   to={link.to}
-                  onClick={() => setMobileMenuOpen(false)}
                   aria-label={link.ariaLabel}
                   className="font-gothic text-4xl text-white hover:text-lightestGrey transition-colors"
                 >
