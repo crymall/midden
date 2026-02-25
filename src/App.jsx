@@ -22,10 +22,8 @@ function App() {
       <AuthProvider>
         <DataProvider>
           <Routes>
-            // Login route
             <Route path="/login" element={<Login />} />
 
-            // Canteen routes
             <Route
               path="/applications/canteen"
               element={<Dashboard navMeta={navMeta.canteen} />}
@@ -43,7 +41,6 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Route>
 
-            // Midden routes
             <Route path="/" element={<Dashboard navMeta={navMeta.midden} />}>
               <Route index element={<Explorer />} />
               <Route path="/experiments" element={<Experiments />} />
