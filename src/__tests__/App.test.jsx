@@ -21,6 +21,14 @@ vi.mock("../pages/Settings", () => ({ default: () => <div>Settings Page</div> })
 vi.mock("../pages/Experiments", () => ({ default: () => <div>Experiments Page</div> }));
 vi.mock("../pages/NotFound", () => ({ default: () => <div>NotFound Page</div> }));
 
+// Mock Canteen pages
+vi.mock("../pages/Canteen/RecipeSearch", () => ({ default: () => <div>RecipeSearch Page</div> }));
+vi.mock("../pages/Canteen/RecipeDetail", () => ({ default: () => <div>RecipeDetail Page</div> }));
+vi.mock("../pages/Canteen/NewRecipe", () => ({ default: () => <div>NewRecipe Page</div> }));
+vi.mock("../pages/Canteen/MyLists", () => ({ default: () => <div>MyLists Page</div> }));
+vi.mock("../pages/Canteen/ListView", () => ({ default: () => <div>ListView Page</div> }));
+vi.mock("../pages/Canteen/UserProfile", () => ({ default: () => <div>UserProfile Page</div> }));
+
 // Mock Header
 vi.mock("../components/Header", () => ({ default: () => <div>Header Component</div> }));
 
@@ -72,6 +80,56 @@ describe("App Routing", () => {
     useAuth.mockReturnValue({ user: { username: "testuser" } });
     render(<App />);
     expect(screen.getByText("Experiments Page")).toBeInTheDocument();
+  });
+
+  it("renders Canteen RecipeSearch at /applications/canteen", () => {
+    window.history.pushState({}, "Canteen", "/applications/canteen");
+    useAuth.mockReturnValue({ user: { username: "testuser" } });
+    render(<App />);
+    expect(screen.getByText("RecipeSearch Page")).toBeInTheDocument();
+  });
+
+  it("renders RecipeDetail page", () => {
+    window.history.pushState({}, "Recipe", "/applications/canteen/recipes/123");
+    useAuth.mockReturnValue({ user: { username: "testuser" } });
+    render(<App />);
+    expect(screen.getByText("RecipeDetail Page")).toBeInTheDocument();
+  });
+
+  it("renders UserProfile page", () => {
+    window.history.pushState({}, "User", "/applications/canteen/user/123");
+    useAuth.mockReturnValue({ user: { username: "testuser" } });
+    render(<App />);
+    expect(screen.getByText("UserProfile Page")).toBeInTheDocument();
+  });
+
+  it("renders NewRecipe page when authenticated", () => {
+    window.history.pushState({}, "New Recipe", "/applications/canteen/recipes/new");
+    useAuth.mockReturnValue({ user: { username: "testuser" } });
+    render(<App />);
+    expect(screen.getByText("NewRecipe Page")).toBeInTheDocument();
+  });
+
+  it("redirects guest from NewRecipe to Login", () => {
+    window.history.pushState({}, "New Recipe", "/applications/canteen/recipes/new");
+    useAuth.mockReturnValue({ user: { username: "guest" } });
+    render(<App />);
+    expect(screen.queryByText("NewRecipe Page")).not.toBeInTheDocument();
+    expect(screen.getByText("Login Page")).toBeInTheDocument();
+  });
+
+  it("renders MyLists page when authenticated", () => {
+    window.history.pushState({}, "My Lists", "/applications/canteen/my-lists");
+    useAuth.mockReturnValue({ user: { username: "testuser" } });
+    render(<App />);
+    expect(screen.getByText("MyLists Page")).toBeInTheDocument();
+  });
+
+  it("renders ListView page when authenticated", () => {
+    window.history.pushState({}, "List View", "/applications/canteen/my-lists/1");
+    useAuth.mockReturnValue({ user: { username: "testuser" } });
+    render(<App />);
+    expect(screen.getByText("ListView Page")).toBeInTheDocument();
   });
 
   it("renders 404 for unknown routes when authenticated", () => {

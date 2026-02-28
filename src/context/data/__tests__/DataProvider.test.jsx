@@ -142,6 +142,29 @@ describe("DataProvider", () => {
       expect(canteenApi.fetchRecipes).toHaveBeenCalledWith(20, 0, undefined, undefined, undefined);
     });
 
+    it("fetches user profile recipes and updates state", async () => {
+      const mockRecipes = [{ id: 1, title: "User Recipe" }];
+      canteenApi.fetchUserRecipes.mockResolvedValue(mockRecipes);
+
+      const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+      const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+      let promise;
+      act(() => {
+        promise = result.current.getUserProfileRecipes("u1", 20, 0);
+      });
+
+      expect(result.current.recipesLoading).toBe(true);
+
+      await act(async () => {
+        await promise;
+      });
+
+      expect(result.current.recipesLoading).toBe(false);
+      expect(result.current.userProfileRecipes).toEqual(mockRecipes);
+      expect(canteenApi.fetchUserRecipes).toHaveBeenCalledWith("u1", 20, 0);
+    });
+
     it("fetches single recipe and updates state", async () => {
       const mockRecipe = { id: "101", title: "Cake" };
       canteenApi.fetchRecipe.mockResolvedValue(mockRecipe);

@@ -15,6 +15,7 @@ import RequireNotGuest from "./components/gateways/RequireNotGuest";
 import MyLists from "./pages/Canteen/MyLists";
 import ListView from "./pages/Canteen/ListView";
 import { navMeta } from "./utils/constants";
+import UserProfile from "./pages/Canteen/UserProfile";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
               <Route index element={<RecipeSearch />} />
               <Route path="recipes" element={<RecipeSearch />} />
               <Route path="recipes/:id" element={<RecipeDetail />} />
+              <Route path="user/:id" element={<UserProfile />} />
 
               <Route element={<RequireNotGuest />}>
                 <Route path="recipes/new" element={<NewRecipe />} />

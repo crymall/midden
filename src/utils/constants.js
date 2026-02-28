@@ -35,9 +35,9 @@ export const navMeta = {
         requiredPermission: PERMISSIONS.writeCanteen,
       },
       {
-        to: "/applications/canteen/my-lists",
-        label: "My Lists",
-        ariaLabel: "my-lists",
+        to: "/applications/canteen/user/:userId",
+        label: "My Profile",
+        ariaLabel: "my-profile",
         requiredPermission: PERMISSIONS.writeCanteen,
       },
       {

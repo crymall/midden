@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef } from "react";
-import { Button, Select } from "@headlessui/react";
 import useData from "../../context/data/useData";
 import MiddenCard from "../../components/MiddenCard";
 import RecipeList from "../../components/canteen/RecipeList";
 import RecipeFilter from "../../components/canteen/RecipeFilter";
+import PaginationControls from "../../components/PaginationControls";
 
 const RecipeSearch = () => {
   const { recipes, recipesLoading, getRecipes } = useData();
@@ -48,39 +48,14 @@ const RecipeSearch = () => {
       <RecipeFilter onFilter={handleFilter} />
       <RecipeList recipes={recipes} loading={recipesLoading} />
 
-      <div className="border-grey mt-6 flex flex-col items-center justify-between gap-4 border-t-2 pt-4 sm:flex-row">
-        <div className="flex items-center gap-2">
-          <label className="text-lightestGrey text-sm font-bold">
-            Rows per page:
-          </label>
-          <Select
-            value={limit}
-            onChange={handleLimitChange}
-            className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey border p-1 focus:outline-none"
-          >
-            <option value={20}>20</option>
-            <option value={50}>50</option>
-          </Select>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <Button
-            disabled={page === 1 || recipesLoading}
-            onClick={() => handlePageChange(page - 1)}
-            className="hover:text-lightestGrey text-xl font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            ← Prev
-          </Button>
-          <span className="text-lightestGrey font-mono">Page {page}</span>
-          <Button
-            disabled={recipes.length < limit || recipesLoading}
-            onClick={() => handlePageChange(page + 1)}
-            className="hover:text-lightestGrey text-xl font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            Next →
-          </Button>
-        </div>
-      </div>
+      <PaginationControls
+        page={page}
+        limit={limit}
+        onPageChange={handlePageChange}
+        onLimitChange={handleLimitChange}
+        loading={recipesLoading}
+        isNextDisabled={recipes.length < limit}
+      />
     </MiddenCard>
   );
 };

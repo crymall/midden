@@ -128,4 +128,33 @@ describe("Header Component", () => {
       state: { from: { pathname: "/current-page" } },
     });
   });
+
+  it("replaces :userId in navigation links with actual user id", () => {
+    const userWithId = { ...user, id: 123 };
+    const navLinks = [
+      { to: "/user/:userId/profile", label: "Profile" },
+    ];
+    render(
+      <MemoryRouter>
+        <Header {...defaultProps} user={userWithId} navLinks={navLinks} />
+      </MemoryRouter>
+    );
+
+    const link = screen.getByText("Profile");
+    expect(link).toHaveAttribute("href", "/user/123/profile");
+  });
+
+  it("does not replace :userId if user is not present", () => {
+    const navLinks = [
+      { to: "/user/:userId/profile", label: "Profile" },
+    ];
+    render(
+      <MemoryRouter>
+        <Header {...defaultProps} user={null} navLinks={navLinks} />
+      </MemoryRouter>
+    );
+
+    const link = screen.getByText("Profile");
+    expect(link).toHaveAttribute("href", "/user/:userId/profile");
+  });
 });

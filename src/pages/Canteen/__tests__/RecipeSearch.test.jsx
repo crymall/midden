@@ -32,6 +32,25 @@ vi.mock("../../../components/canteen/RecipeFilter", () => ({
   ),
 }));
 
+// Mock PaginationControls to isolate RecipeSearch logic
+vi.mock("../../../components/PaginationControls", () => ({
+  default: ({ page, limit, onPageChange, onLimitChange, loading, isNextDisabled }) => (
+    <div data-testid="pagination-controls">
+      <span data-testid="page-val">{page}</span>
+      <span data-testid="limit-val">{limit}</span>
+      <span data-testid="loading-val">{String(loading)}</span>
+      <span data-testid="next-disabled-val">{String(isNextDisabled)}</span>
+      <button onClick={() => onPageChange(page - 1)}>Prev</button>
+      <button onClick={() => onPageChange(page + 1)}>Next</button>
+      <input 
+        data-testid="limit-input"
+        value={limit} 
+        onChange={onLimitChange} 
+      />
+    </div>
+  ),
+}));
+
 describe("RecipeSearch", () => {
   const mockGetRecipes = vi.fn();
 
@@ -72,31 +91,24 @@ describe("RecipeSearch", () => {
     render(<RecipeSearch />);
 
     // Check initial state
-    expect(screen.getByText("Page 1")).toBeInTheDocument();
-    const nextBtn = screen.getByText("Next →");
-    const prevBtn = screen.getByText("← Prev");
-
-    expect(prevBtn).toBeDisabled();
-    expect(nextBtn).not.toBeDisabled();
+    expect(screen.getByTestId("page-val")).toHaveTextContent("1");
 
     // Click Next
-    fireEvent.click(nextBtn);
+    fireEvent.click(screen.getByText("Next"));
     expect(mockGetRecipes).toHaveBeenCalledWith(20, 20, {});
-    expect(screen.getByText("Page 2")).toBeInTheDocument();
+    expect(screen.getByTestId("page-val")).toHaveTextContent("2");
 
     // Click Prev
-    fireEvent.click(prevBtn);
+    fireEvent.click(screen.getByText("Prev"));
     expect(mockGetRecipes).toHaveBeenCalledWith(20, 0, {});
-    expect(screen.getByText("Page 1")).toBeInTheDocument();
+    expect(screen.getByTestId("page-val")).toHaveTextContent("1");
   });
 
   it("handles limit change", () => {
     render(<RecipeSearch />);
 
-    const select = screen.getByRole("combobox");
-    fireEvent.change(select, { target: { value: "50" } });
-
-    // Should reset to page 1 and fetch with new limit
+    const input = screen.getByTestId("limit-input");
+    fireEvent.change(input, { target: { value: "50" } });
     expect(mockGetRecipes).toHaveBeenCalledWith(50, 0, {});
   });
 
@@ -110,7 +122,7 @@ describe("RecipeSearch", () => {
     expect(mockGetRecipes).toHaveBeenCalledWith(20, 0, { title: "Test Filter" });
   });
 
-  it("disables Next button when fewer recipes than limit are returned", () => {
+  it("passes correct disabled state to pagination controls", () => {
     useData.mockReturnValue({
       recipes: Array.from({ length: 10 }, (_, i) => ({ id: i + 1 })), // 10 < 20
       recipesLoading: false,
@@ -118,11 +130,10 @@ describe("RecipeSearch", () => {
     });
 
     render(<RecipeSearch />);
-    const nextBtn = screen.getByText("Next →");
-    expect(nextBtn).toBeDisabled();
+    expect(screen.getByTestId("next-disabled-val")).toHaveTextContent("true");
   });
 
-  it("disables pagination buttons while loading", () => {
+  it("passes correct loading state to pagination controls", () => {
     useData.mockReturnValue({
       recipes: [],
       recipesLoading: true,
@@ -130,10 +141,6 @@ describe("RecipeSearch", () => {
     });
 
     render(<RecipeSearch />);
-    const nextBtn = screen.getByText("Next →");
-    const prevBtn = screen.getByText("← Prev");
-
-    expect(nextBtn).toBeDisabled();
-    expect(prevBtn).toBeDisabled();
+    expect(screen.getByTestId("loading-val")).toHaveTextContent("true");
   });
 });

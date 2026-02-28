@@ -68,6 +68,13 @@ describe("canteenApi", () => {
       });
     });
 
+    it("fetchUserRecipes calls get with correct params", async () => {
+      await api.fetchUserRecipes("u1", 10, 5);
+      expect(mockGet).toHaveBeenCalledWith("/recipes/user/u1", {
+        params: { limit: 10, offset: 5 },
+      });
+    });
+
     it("fetchPopularRecipes calls get with correct params", async () => {
       await api.fetchPopularRecipes(10, 0);
       expect(mockGet).toHaveBeenCalledWith("/recipes/popular", {

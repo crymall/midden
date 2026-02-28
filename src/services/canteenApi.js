@@ -28,6 +28,13 @@ export const fetchRecipes = async (
   return response.data;
 };
 
+export const fetchUserRecipes = async (userId, limit, offset) => {
+  const response = await canteenApi.get(`/recipes/user/${userId}`, {
+    params: { limit, offset },
+  });
+  return response.data;
+};
+
 export const fetchPopularRecipes = async (limit, offset) => {
   const response = await canteenApi.get("/recipes/popular", {
     params: { limit, offset },

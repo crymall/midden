@@ -11,6 +11,7 @@ export const DataProvider = ({ children }) => {
   // Canteen State
   const [recipes, setRecipes] = useState([]);
   const [recipesLoading, setRecipesLoading] = useState(false);
+  const [userProfileRecipes, setUserProfileRecipes] = useState([]);
   const [currentRecipe, setCurrentRecipe] = useState(null);
   const [ingredients, setIngredients] = useState([]);
   const [tags, setTags] = useState([]);
@@ -76,6 +77,18 @@ export const DataProvider = ({ children }) => {
     },
     [],
   );
+
+  const getUserProfileRecipes = useCallback(async (userId, limit = 50, offset = 0) => {
+    setRecipesLoading(true);
+    try {
+      const data = await canteenApi.fetchUserRecipes(userId, limit, offset);
+      setUserProfileRecipes(data);
+    } catch (err) {
+      console.error("Fetch user recipes failed", err);
+    } finally {
+      setRecipesLoading(false);
+    }
+  }, []);
 
   const getPopularRecipes = useCallback(async (limit = 50, offset = 0) => {
     setRecipesLoading(true);
@@ -225,6 +238,8 @@ export const DataProvider = ({ children }) => {
         recipesLoading,
         currentRecipe,
         ingredients,
+        userProfileRecipes,
+        getUserProfileRecipes,
         tags,
         userLists,
         getRecipes,
