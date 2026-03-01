@@ -5,6 +5,17 @@ import NewRecipe from "../NewRecipe";
 import useData from "../../../context/data/useData";
 
 vi.mock("../../../context/data/useData");
+vi.mock("../../../components/canteen/DurationInput", () => ({
+  default: ({ label, onChange }) => (
+    <div>
+      <label htmlFor={label}>{label}</label>
+      <input
+        id={label}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    </div>
+  ),
+}));
 
 const mockNavigate = vi.fn();
 vi.mock("react-router-dom", async () => {
@@ -117,5 +128,37 @@ describe("NewRecipe", () => {
       // Should refresh ingredients list
       expect(mockGetIngredients).toHaveBeenCalled();
     });
+  });
+
+  it("submits form with all fields including wait time", async () => {
+    mockCreateRecipe.mockResolvedValue({ id: "123" });
+
+    render(
+      <MemoryRouter>
+        <NewRecipe />
+      </MemoryRouter>
+    );
+
+    fireEvent.change(screen.getByLabelText("Title"), { target: { value: "My Recipe" } });
+    fireEvent.change(screen.getByLabelText("Prep Time"), { target: { value: "10" } });
+    fireEvent.change(screen.getByLabelText("Cook Time"), { target: { value: "20" } });
+    fireEvent.change(screen.getByLabelText("Wait Time"), { target: { value: "30" } });
+    fireEvent.change(screen.getByLabelText("Servings"), { target: { value: "4" } });
+
+    const submitBtn = screen.getByText("Create Recipe");
+    fireEvent.click(submitBtn);
+
+    await waitFor(() => {
+      expect(mockCreateRecipe).toHaveBeenCalledWith(expect.objectContaining({
+        title: "My Recipe",
+        prep_time_minutes: 10,
+        cook_time_minutes: 20,
+        wait_time_minutes: 30,
+        servings: 4,
+      }));
+    });
+
+    // Should navigate to new recipe
+    expect(mockNavigate).toHaveBeenCalledWith("/applications/canteen/recipes/123");
   });
 });

@@ -85,7 +85,7 @@ describe("MyLists", () => {
       </MemoryRouter>
     );
 
-    const createBtn = screen.getByText("+");
+    const createBtn = screen.getByText("+ List");
     fireEvent.click(createBtn);
 
     expect(screen.getByText("Create New List")).toBeInTheDocument();

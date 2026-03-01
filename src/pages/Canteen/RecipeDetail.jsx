@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { Button } from "@headlessui/react";
 import useData from "../../context/data/useData";
 import useAuth from "../../context/auth/useAuth";
@@ -75,9 +75,12 @@ const RecipeDetail = () => {
                 {currentRecipe.author && (
                   <p className="text-lightGrey font-mono text-sm">
                     By{" "}
-                    <span className="text-accent">
+                    <Link
+                      to={`/applications/canteen/user/${currentRecipe.author.id}`}
+                      className="text-accent hover:underline"
+                    >
                       {currentRecipe.author.username}
-                    </span>
+                    </Link>
                   </p>
                 )}
               </div>
@@ -114,13 +117,13 @@ const RecipeDetail = () => {
               </div>
             </Can>
           </div>
-          <p className="text-lightestGrey font-mono text-lg italic mt-4 md:mt-0">
+          <p className="text-lightestGrey mt-4 font-mono text-lg italic md:mt-0">
             {currentRecipe.description}
           </p>
         </div>
 
-        {/* Stats */}
-        <div className="text-lightestGrey grid grid-cols-3 gap-4 rounded-lg bg-white/5 p-4 text-center font-mono">
+        {/* Time Stats */}
+        <div className="text-lightestGrey grid grid-cols-2 gap-4 rounded-lg bg-white/5 p-4 text-center font-mono md:grid-cols-4">
           <div>
             <span className="text-grey block text-xs tracking-wider uppercase">
               Prep Time
@@ -139,9 +142,19 @@ const RecipeDetail = () => {
           </div>
           <div>
             <span className="text-grey block text-xs tracking-wider uppercase">
+              Total Time
+            </span>
+            <span className="text-xl font-bold">
+              {currentRecipe.total_time_minutes}m
+            </span>
+          </div>
+          <div>
+            <span className="text-grey block text-xs tracking-wider uppercase">
               Servings
             </span>
-            <span className="text-xl font-bold">{currentRecipe.servings}</span>
+            <span className="text-xl font-bold">
+              {currentRecipe.servings}
+            </span>
           </div>
         </div>
 
@@ -180,7 +193,6 @@ const RecipeDetail = () => {
           </div>
         </div>
       </div>
-
     </MiddenCard>
   );
 };

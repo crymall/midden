@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import MiddenModal from "../MiddenModal";
 
@@ -10,23 +10,27 @@ global.ResizeObserver = class ResizeObserver {
 };
 
 describe("MiddenModal", () => {
-  it("renders children and title when open", () => {
+  it("renders children and title when open", async () => {
     render(
       <MiddenModal isOpen={true} onClose={() => {}} title="Test Modal">
         <div>Modal Content</div>
       </MiddenModal>
     );
-    expect(screen.getByText("Test Modal")).toBeInTheDocument();
-    expect(screen.getByText("Modal Content")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Test Modal")).toBeInTheDocument();
+      expect(screen.getByText("Modal Content")).toBeInTheDocument();
+    });
   });
 
-  it("does not render when closed", () => {
+  it("does not render when closed", async () => {
     render(
       <MiddenModal isOpen={false} onClose={() => {}} title="Test Modal">
         <div>Modal Content</div>
       </MiddenModal>
     );
-    expect(screen.queryByText("Test Modal")).not.toBeInTheDocument();
-    expect(screen.queryByText("Modal Content")).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText("Test Modal")).not.toBeInTheDocument();
+      expect(screen.queryByText("Modal Content")).not.toBeInTheDocument();
+    });
   });
 });

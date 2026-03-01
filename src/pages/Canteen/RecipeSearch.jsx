@@ -1,9 +1,13 @@
 import { useEffect, useState, useRef } from "react";
+import { Link } from "react-router-dom";
+import { Button } from "@headlessui/react";
 import useData from "../../context/data/useData";
 import MiddenCard from "../../components/MiddenCard";
 import RecipeList from "../../components/canteen/RecipeList";
 import RecipeFilter from "../../components/canteen/RecipeFilter";
-import PaginationControls from "../../components/PaginationControls";
+import PaginationControls from "../../components/canteen/PaginationControls";
+import Can from "../../components/gateways/Can";
+import { PERMISSIONS } from "../../utils/constants";
 
 const RecipeSearch = () => {
   const { recipes, recipesLoading, getRecipes } = useData();
@@ -40,13 +44,26 @@ const RecipeSearch = () => {
     getRecipes(newLimit, 0, filters);
   };
 
+  const hasFilters = filters.title || (filters.tags && filters.tags.length > 0);
+
   return (
     <MiddenCard>
-      <h2 className="mb-4 font-gothic text-4xl font-bold text-white">
-        Find Recipes
-      </h2>
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="font-gothic text-4xl font-bold text-white">
+          Find Recipes
+        </h2>
+        <Can perform={PERMISSIONS.writeCanteen}>
+          <Link to="/applications/canteen/recipes/new">
+            <Button className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-white transition-colors">+ Recipe</Button>
+          </Link>
+        </Can>
+      </div>
       <RecipeFilter onFilter={handleFilter} />
-      <RecipeList recipes={recipes} loading={recipesLoading} />
+      <RecipeList
+        recipes={recipes}
+        loading={recipesLoading}
+        emptyMessage={hasFilters ? "No recipes found matching your search." : "No recipes found in the canteen."}
+      />
 
       <PaginationControls
         page={page}

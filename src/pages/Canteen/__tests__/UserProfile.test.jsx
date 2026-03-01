@@ -1,24 +1,30 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
-import UserProfile from "./UserProfile";
-import useData from "../../context/data/useData";
-import useAuth from "../../context/auth/useAuth";
+import UserProfile from "../UserProfile";
+import useData from "../../../context/data/useData";
+import useAuth from "../../../context/auth/useAuth";
 
 // Mock hooks
-vi.mock("../../context/data/useData");
-vi.mock("../../context/auth/useAuth");
+vi.mock("../../../context/data/useData");
+vi.mock("../../../context/auth/useAuth");
 
 // Mock child components to isolate UserProfile logic
-vi.mock("../../components/canteen/RecipeList", () => ({
+vi.mock("../../../components/canteen/RecipeList", () => ({
   default: ({ recipes }) => <div data-testid="recipe-list">{recipes.length} Recipes</div>,
 }));
-vi.mock("../../components/canteen/ListList", () => ({
+vi.mock("../../../components/canteen/ListList", () => ({
   default: ({ userLists }) => <div data-testid="list-list">{userLists.length} Lists</div>,
 }));
-vi.mock("../../components/PaginationControls", () => ({
+vi.mock("../../../components/canteen/PaginationControls", () => ({
   default: ({ onPageChange, page }) => (
     <button onClick={() => onPageChange(page + 1)}>Next Page</button>
+  ),
+}));
+
+vi.mock("../../../components/MiddenModal", () => ({
+  default: ({ isOpen, children, title }) => (
+    isOpen ? <div data-testid="midden-modal"><h2>{title}</h2>{children}</div> : null
   ),
 }));
 
@@ -61,9 +67,10 @@ describe("UserProfile", () => {
     );
   };
 
-  it("renders loading state initially", () => {
+  it("renders loading state initially", async () => {
     renderComponent();
     expect(screen.getByText("Loading profile...")).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText("Loading profile...")).not.toBeInTheDocument());
   });
 
   it("renders user profile data after loading", async () => {
@@ -94,7 +101,9 @@ describe("UserProfile", () => {
     await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
 
     const listsTab = screen.getByText("ViewedUser's Lists");
-    fireEvent.click(listsTab);
+    await act(async () => {
+      fireEvent.click(listsTab);
+    });
 
     expect(mockGetUserLists).toHaveBeenCalledWith("2", 20, 0);
     expect(screen.getByTestId("list-list")).toBeInTheDocument();
@@ -106,7 +115,9 @@ describe("UserProfile", () => {
 
     await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
 
-    fireEvent.click(screen.getByText("ViewedUser's Lists"));
+    await act(async () => {
+      fireEvent.click(screen.getByText("ViewedUser's Lists"));
+    });
 
     expect(screen.getByText("Manage My Lists →")).toBeInTheDocument();
   });
@@ -117,8 +128,30 @@ describe("UserProfile", () => {
 
     await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
 
-    fireEvent.click(screen.getByText("ViewedUser's Lists"));
+    await act(async () => {
+      fireEvent.click(screen.getByText("ViewedUser's Lists"));
+    });
 
     expect(screen.queryByText("Manage My Lists →")).not.toBeInTheDocument();
+  });
+
+  it("renders create buttons for own profile", async () => {
+    useAuth.mockReturnValue({ user: { id: 2, username: "ViewedUser" } });
+    renderComponent("2");
+    await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
+
+    expect(screen.getByText("+ List")).toBeInTheDocument();
+    expect(screen.getByText("+ Recipe")).toBeInTheDocument();
+  });
+
+  it("opens create list modal", async () => {
+    useAuth.mockReturnValue({ user: { id: 2, username: "ViewedUser" } });
+    renderComponent("2");
+    await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
+
+    await act(async () => {
+      fireEvent.click(screen.getByText("+ List"));
+    });
+    expect(screen.getByTestId("midden-modal")).toBeInTheDocument();
   });
 });

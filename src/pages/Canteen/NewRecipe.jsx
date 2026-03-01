@@ -18,6 +18,7 @@ import {
 import useData from "../../context/data/useData";
 import MiddenCard from "../../components/MiddenCard";
 import MiddenModal from "../../components/MiddenModal";
+import DurationInput from "../../components/canteen/DurationInput";
 
 const NewRecipe = () => {
   const navigate = useNavigate();
@@ -38,6 +39,7 @@ const NewRecipe = () => {
     description: "",
     prep_time_minutes: "",
     cook_time_minutes: "",
+    wait_time_minutes: "",
     servings: "",
     instructions: "",
   });
@@ -156,6 +158,7 @@ const NewRecipe = () => {
       ...formData,
       prep_time_minutes: Number(formData.prep_time_minutes),
       cook_time_minutes: Number(formData.cook_time_minutes),
+      wait_time_minutes: Number(formData.wait_time_minutes),
       servings: Number(formData.servings),
       ingredients: ingredients.filter((i) => i.name.trim() !== ""),
       tags: selectedTags,
@@ -238,12 +241,24 @@ const NewRecipe = () => {
             required: true,
           })}
           {renderTextarea("Description", "description", 3, "md:col-span-2")}
-          {renderField("Prep Time (minutes)", "prep_time_minutes", "number", "", {
-            min: "0",
-          })}
-          {renderField("Cook Time (minutes)", "cook_time_minutes", "number", "", {
-            min: "0",
-          })}
+          <DurationInput
+            label="Prep Time"
+            onChange={(val) =>
+              setFormData((prev) => ({ ...prev, prep_time_minutes: val }))
+            }
+          />
+          <DurationInput
+            label="Cook Time"
+            onChange={(val) =>
+              setFormData((prev) => ({ ...prev, cook_time_minutes: val }))
+            }
+          />
+          <DurationInput
+            label="Wait Time"
+            onChange={(val) =>
+              setFormData((prev) => ({ ...prev, wait_time_minutes: val }))
+            }
+          />
           {renderField("Servings", "servings", "number", "", {
             min: "0",
             step: "any",

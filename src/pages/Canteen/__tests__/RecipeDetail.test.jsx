@@ -6,6 +6,7 @@ import useAuth from "../../../context/auth/useAuth";
 
 vi.mock("react-router-dom", () => ({
   useParams: () => ({ id: "123" }),
+  Link: ({ to, children }) => <a href={to}>{children}</a>,
 }));
 
 vi.mock("../../../context/data/useData");
@@ -43,10 +44,12 @@ describe("RecipeDetail", () => {
   const mockRecipe = {
     id: "123",
     title: "Test Recipe",
-    author: { username: "chef_test" },
+    author: { id: "u1", username: "chef_test" },
     description: "A tasty test recipe",
     prep_time_minutes: 10,
     cook_time_minutes: 20,
+    wait_time_minutes: 30,
+    total_time_minutes: 60,
     servings: 4,
     ingredients: [
       { quantity: "1", unit: "cup", name: "Flour", notes: "sifted" },
@@ -96,10 +99,17 @@ describe("RecipeDetail", () => {
     expect(screen.getByText("A tasty test recipe")).toBeInTheDocument();
     expect(screen.getByText("10m")).toBeInTheDocument(); // Prep
     expect(screen.getByText("20m")).toBeInTheDocument(); // Cook
+    expect(screen.getByText("60m")).toBeInTheDocument(); // Total
     expect(screen.getByText("4")).toBeInTheDocument(); // Servings
     expect(screen.getByText("Flour")).toBeInTheDocument();
     expect(screen.getByText("Mix and bake.")).toBeInTheDocument();
     expect(screen.getByText("TestTag")).toBeInTheDocument();
+  });
+
+  it("renders author link correctly", () => {
+    render(<RecipeDetail />);
+    const authorLink = screen.getByText("chef_test").closest("a");
+    expect(authorLink).toHaveAttribute("href", "/applications/canteen/user/u1");
   });
 
   it("handles like toggle", () => {

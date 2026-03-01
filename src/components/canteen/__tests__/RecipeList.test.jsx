@@ -22,6 +22,11 @@ describe("RecipeList", () => {
     expect(screen.getByText(/No recipes found in the canteen/i)).toBeInTheDocument();
   });
 
+  it("renders custom empty message", () => {
+    render(<RecipeList recipes={[]} loading={false} emptyMessage="Custom Message" />);
+    expect(screen.getByText("Custom Message")).toBeInTheDocument();
+  });
+
   it("renders a list of recipes", () => {
     const mockRecipes = [
       { id: "1", title: "Tacos" },

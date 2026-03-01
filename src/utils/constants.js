@@ -29,12 +29,6 @@ export const navMeta = {
         ariaLabel: "recipe-search"
       },
       {
-        to: "/applications/canteen/recipes/new",
-        label: "New Recipe",
-        ariaLabel: "new-recipe",
-        requiredPermission: PERMISSIONS.writeCanteen,
-      },
-      {
         to: "/applications/canteen/user/:userId",
         label: "My Profile",
         ariaLabel: "my-profile",

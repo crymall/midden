@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { Button } from "@headlessui/react";
 import useData from "../../context/data/useData";
 import useAuth from "../../context/auth/useAuth";
 import MiddenCard from "../../components/MiddenCard";
 import RecipeList from "../../components/canteen/RecipeList";
 import ListList from "../../components/canteen/ListList";
-import PaginationControls from "../../components/PaginationControls";
+import PaginationControls from "../../components/canteen/PaginationControls";
+import CreateListModal from "../../components/canteen/CreateListModal";
 
 const UserProfile = () => {
   const { id } = useParams();
@@ -21,6 +23,8 @@ const UserProfile = () => {
   const [viewedUser, setViewedUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const [activeTab, setActiveTab] = useState("recipes");
+  const [isCreateListOpen, setIsCreateListOpen] = useState(false);
+  const [creatingList, setCreatingList] = useState(false);
 
   // Pagination State
   const [recipePage, setRecipePage] = useState(1);
@@ -61,6 +65,20 @@ const UserProfile = () => {
     }
   }, [id, listPage, listLimit, getUserLists]);
 
+  const handleCreateList = async (name) => {
+    setCreatingList(true);
+    try {
+      await canteenApi.createList(name);
+      await getUserLists(id, listLimit, (listPage - 1) * listLimit);
+      setIsCreateListOpen(false);
+      setActiveTab("lists");
+    } catch (error) {
+      console.error("Failed to create list", error);
+    } finally {
+      setCreatingList(false);
+    }
+  };
+
   const isOwnProfile =
     currentUser &&
     viewedUser &&
@@ -90,9 +108,24 @@ const UserProfile = () => {
 
   return (
     <MiddenCard>
-      <h1 className="font-gothic text-4xl font-bold text-white mb-4">
-        {viewedUser.username}
-      </h1>
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="font-gothic text-4xl font-bold text-white">
+          {viewedUser.username}
+        </h1>
+        {isOwnProfile && (
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setIsCreateListOpen(true)}
+              className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-white transition-colors"
+            >
+              + List
+            </Button>
+            <Link to="/applications/canteen/recipes/new">
+              <Button className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-white transition-colors">+ Recipe</Button>
+            </Link>
+          </div>
+        )}
+      </div>
 
       {/* Tabs */}
       <div className="border-grey mb-6 flex border-b">
@@ -163,6 +196,13 @@ const UserProfile = () => {
           />
         </div>
       )}
+
+      <CreateListModal
+        isOpen={isCreateListOpen}
+        onClose={() => setIsCreateListOpen(false)}
+        onCreate={handleCreateList}
+        loading={creatingList}
+      />
     </MiddenCard>
   );
 };
