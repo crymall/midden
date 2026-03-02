@@ -50,7 +50,7 @@ const RecipeCard = ({ recipe }) => {
             </span>
           ))}
         </div>
-        <Can perform={PERMISSIONS.writeCanteen}>
+        <Can perform={PERMISSIONS.writeData}>
           <ListAddPopover
             recipeId={recipe.id}
             className="pointer-events-auto relative z-20"

@@ -90,23 +90,6 @@ describe("Login Component", () => {
     expect(screen.getByLabelText(/verification code/i)).toBeInTheDocument();
   });
 
-  it("logs out guest user on mount", () => {
-    useAuth.mockReturnValue({
-      login: mockLogin,
-      verifyLogin: mockVerifyLogin,
-      register: mockRegister,
-      logout: mockLogout,
-      user: { username: "guest" },
-    });
-
-    render(
-      <MemoryRouter>
-        <Login />
-      </MemoryRouter>
-    );
-    expect(mockLogout).toHaveBeenCalled();
-  });
-
   it("displays error message on login failure", async () => {
     const user = userEvent.setup();
     const errorMsg = "Invalid credentials";

@@ -56,7 +56,7 @@ vi.mock("../../../components/canteen/PaginationControls", () => ({
 
 vi.mock("../../../utils/constants", () => ({
   PERMISSIONS: {
-    writeCanteen: "write_canteen",
+    writeData: "write_data",
   },
 }));
 
@@ -155,7 +155,7 @@ describe("RecipeSearch", () => {
   });
 
   it("renders create button when user has permission", () => {
-    useAuth.mockReturnValue({ user: { permissions: ["write_canteen"] } });
+    useAuth.mockReturnValue({ user: { permissions: ["write_data"] } });
     render(<MemoryRouter><RecipeSearch /></MemoryRouter>);
     
     const createBtn = screen.getByText("+ Recipe");

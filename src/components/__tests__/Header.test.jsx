@@ -68,16 +68,6 @@ describe("Header Component", () => {
     expect(mockNavigate).not.toHaveBeenCalledWith("/login");
   });
 
-  it("does not show settings button for guest user", () => {
-    const guestUser = { username: "guest" };
-    render(
-      <MemoryRouter>
-        <Header {...defaultProps} user={guestUser} />
-      </MemoryRouter>
-    );
-    expect(screen.queryByRole("button", { name: /settings/i })).not.toBeInTheDocument();
-  });
-
   it("renders navigation links when provided", () => {
     const navLinks = [
       { to: "/test", label: "Test Link", ariaLabel: "Test" },

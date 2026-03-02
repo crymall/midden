@@ -95,7 +95,7 @@ const RecipeDetail = () => {
                 ))}
               </div>
             </div>
-            <Can perform={PERMISSIONS.writeCanteen}>
+            <Can perform={PERMISSIONS.writeData}>
               <div className="flex gap-2">
                 <Button
                   onClick={handleLike}

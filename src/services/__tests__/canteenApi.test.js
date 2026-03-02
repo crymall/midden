@@ -233,10 +233,5 @@ describe("canteenApi", () => {
       await api.fetchUser("u1");
       expect(mockGet).toHaveBeenCalledWith("/users/u1");
     });
-
-    it("createUser calls post", async () => {
-      await api.createUser("john", "iam123");
-      expect(mockPost).toHaveBeenCalledWith("/users", { username: "john", iam_id: "iam123" });
-    });
   });
 });

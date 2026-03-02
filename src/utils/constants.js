@@ -5,10 +5,8 @@ export const ROLES = {
 };
 
 export const PERMISSIONS = {
-  readUsers: "read:users",
   writeUsers: "write:users",
-  readCanteen: "read:canteen",
-  writeCanteen: "write:canteen",
+  writeData: "write:data",
 }
 
 export const navMeta = {
@@ -32,7 +30,7 @@ export const navMeta = {
         to: "/applications/canteen/user/:userId",
         label: "My Profile",
         ariaLabel: "my-profile",
-        requiredPermission: PERMISSIONS.writeCanteen,
+        requiredPermission: PERMISSIONS.writeData,
       },
       {
         to: "/",

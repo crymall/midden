@@ -6,7 +6,6 @@ import Can from "./gateways/Can";
 const Header = ({ user, logout, title, titleLink, navLinks }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const isGuest = user && user.username === "guest";
 
   const processedNavLinks = navLinks.map((link) => ({
     ...link,
@@ -80,7 +79,7 @@ const Header = ({ user, logout, title, titleLink, navLinks }) => {
         {processedNavLinks.length && <nav className="ml-24 hidden items-center gap-16 xl:flex">{desktopNavLinks}</nav>}
       </div>
       <div className="flex items-center gap-4 font-mono">
-        {user && !isGuest ? (
+        {user ? (
           loggedInterface
         ) : (
           <Button

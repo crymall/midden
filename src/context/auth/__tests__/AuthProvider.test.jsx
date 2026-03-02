@@ -145,9 +145,6 @@ describe("AuthProvider", () => {
     expect(window.localStorage.removeItem).toHaveBeenCalledWith("token");
     expect(result.current.user).toBeNull();
     expect(mockNavigate).not.toHaveBeenCalledWith("/login");
-
-    // Since user is null and we are at /dashboard, auto-login should trigger
-    await waitFor(() => expect(iamApi.login).toHaveBeenCalledWith("guest", "guest"));
   });
   
   it("handles register", async () => {
@@ -161,18 +158,5 @@ describe("AuthProvider", () => {
     });
     
     expect(iamApi.register).toHaveBeenCalledWith("newuser", "email@test.com", "password");
-  });
-
-  it("automatically logs in as guest if no user and not on login page", async () => {
-    window.localStorage.getItem.mockReturnValue(null);
-    iamApi.login.mockResolvedValue({ token: "guest-token" });
-    jwtDecode.mockReturnValue({ username: "guest", exp: Date.now() / 1000 + 1000 });
-
-    const wrapper = ({ children }) => <AuthProvider>{children}</AuthProvider>;
-    const { result } = renderHook(() => useContext(AuthContext), { wrapper });
-
-    await waitFor(() => expect(result.current.user?.username).toBe("guest"));
-    expect(iamApi.login).toHaveBeenCalledWith("guest", "guest");
-    expect(window.localStorage.setItem).toHaveBeenCalledWith("token", "guest-token");
   });
 });

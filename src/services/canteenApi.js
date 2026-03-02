@@ -184,8 +184,3 @@ export const fetchUser = async (id) => {
   const response = await canteenApi.get(`/users/${id}`);
   return response.data;
 };
-
-export const createUser = async (username, iamId) => {
-  const response = await canteenApi.post("/users", { username, iam_id: iamId });
-  return response.data;
-};

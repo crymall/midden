@@ -42,19 +42,6 @@ const AuthProvider = ({ children }) => {
     showPage();
   }, []);
 
-  useEffect(() => {
-    if (!loading && !user && location.pathname !== "/login") {
-      iamApi
-        .login("guest", "guest")
-        .then((data) => {
-          if (data.token) {
-            checkToken(data.token);
-          }
-        })
-        .catch((err) => console.error("Auto guest login failed", err));
-    }
-  }, [loading, user, location.pathname]);
-
   const login = async (username, password) => {
     const data = await iamApi.login(username, password);
     if (data.token) {
