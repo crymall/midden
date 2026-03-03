@@ -234,4 +234,62 @@ describe("canteenApi", () => {
       expect(mockGet).toHaveBeenCalledWith("/users/u1");
     });
   });
+
+  describe("Relationships", () => {
+    it("followUser calls post", async () => {
+      await api.followUser("u2");
+      expect(mockPost).toHaveBeenCalledWith("/relationships/u2");
+    });
+
+    it("unfollowUser calls delete", async () => {
+      await api.unfollowUser("u2");
+      expect(mockDelete).toHaveBeenCalledWith("/relationships/u2");
+    });
+
+    it("fetchFollowers calls get", async () => {
+      await api.fetchFollowers("u1");
+      expect(mockGet).toHaveBeenCalledWith("/relationships/u1/followers");
+    });
+
+    it("fetchFollowing calls get", async () => {
+      await api.fetchFollowing("u1");
+      expect(mockGet).toHaveBeenCalledWith("/relationships/u1/following");
+    });
+
+    it("fetchFriends calls get", async () => {
+      await api.fetchFriends("u1");
+      expect(mockGet).toHaveBeenCalledWith("/relationships/u1/friends");
+    });
+  });
+
+  describe("Messages", () => {
+    it("sendMessage calls post with correct data", async () => {
+      const data = { receiver_id: "u2", content: "Hello", recipe_id: 1, list_id: null };
+      await api.sendMessage("u2", "Hello", 1, null);
+      expect(mockPost).toHaveBeenCalledWith("/messages", data);
+    });
+
+    it("fetchThreads calls get", async () => {
+      await api.fetchThreads(20, 0);
+      expect(mockGet).toHaveBeenCalledWith("/messages/threads", {
+        params: { limit: 20, offset: 0 },
+      });
+    });
+
+    it("fetchConversation calls get with other user id", async () => {
+      await api.fetchConversation("u2", 20, 0);
+      expect(mockGet).toHaveBeenCalledWith("/messages/u2", {
+        params: { limit: 20, offset: 0 },
+      });
+    });
+  });
+
+  describe("Notifications", () => {
+    it("fetchNotifications calls get", async () => {
+      await api.fetchNotifications(20, 0);
+      expect(mockGet).toHaveBeenCalledWith("/notifications", {
+        params: { limit: 20, offset: 0 },
+      });
+    });
+  });
 });

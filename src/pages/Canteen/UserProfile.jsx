@@ -19,6 +19,12 @@ const UserProfile = () => {
     getUserLists,
     userLists,
     recipesLoading,
+    followers,
+    following,
+    getFollowers,
+    getFollowing,
+    followUser,
+    unfollowUser,
   } = useData();
   const [viewedUser, setViewedUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
@@ -38,7 +44,11 @@ const UserProfile = () => {
       if (id) {
         setLoadingUser(true);
         try {
-          const userData = await canteenApi.fetchUser(id);
+          const [userData] = await Promise.all([
+            canteenApi.fetchUser(id),
+            getFollowers(id),
+            getFollowing(id),
+          ]);
           setViewedUser(userData);
         } catch (error) {
           console.error("Failed to load user profile data", error);
@@ -48,7 +58,7 @@ const UserProfile = () => {
       }
     };
     loadData();
-  }, [id, canteenApi]);
+  }, [id, canteenApi, getFollowers, getFollowing]);
 
   useEffect(() => {
     if (id) {
@@ -84,6 +94,19 @@ const UserProfile = () => {
     viewedUser &&
     String(currentUser.id) === String(viewedUser.id);
 
+  const isFollowing =
+    currentUser &&
+    followers.some((f) => String(f.id) === String(currentUser.id));
+
+  const handleFollowToggle = async () => {
+    if (isFollowing) {
+      await unfollowUser(id);
+    } else {
+      await followUser(id);
+    }
+    getFollowers(id);
+  };
+
   if (loadingUser) {
     return (
       <MiddenCard>
@@ -109,22 +132,50 @@ const UserProfile = () => {
   return (
     <MiddenCard>
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="font-gothic text-4xl font-bold text-white">
-          {viewedUser.username}
-        </h1>
-        {isOwnProfile && (
-          <div className="flex gap-2">
-            <Button
-              onClick={() => setIsCreateListOpen(true)}
-              className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-white transition-colors"
-            >
-              + List
-            </Button>
-            <Link to="/applications/canteen/recipes/new">
-              <Button className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-white transition-colors">+ Recipe</Button>
-            </Link>
+        <div>
+          <h1 className="font-gothic text-4xl font-bold text-white">
+            {viewedUser.username}
+          </h1>
+          <div className="text-lightGrey mt-1 flex gap-4 font-mono text-sm">
+            <span>
+              <strong className="text-white">{followers.length}</strong>{" "}
+              Followers
+            </span>
+            <span>
+              <strong className="text-white">{following.length}</strong>{" "}
+              Following
+            </span>
           </div>
-        )}
+        </div>
+        <div className="flex gap-2">
+          {!isOwnProfile && currentUser && (
+            <Button
+              onClick={handleFollowToggle}
+              className={`px-3 py-1 text-sm font-bold transition-colors ${
+                isFollowing
+                  ? "border-grey text-lightGrey hover:border-lightestGrey hover:text-white border bg-transparent"
+                  : "bg-accent hover:bg-accent/80 text-white"
+              }`}
+            >
+              {isFollowing ? "Unfollow" : "Follow"}
+            </Button>
+          )}
+          {isOwnProfile && (
+            <>
+              <Button
+                onClick={() => setIsCreateListOpen(true)}
+                className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-white transition-colors"
+              >
+                + List
+              </Button>
+              <Link to="/applications/canteen/recipes/new">
+                <Button className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-white transition-colors">
+                  + Recipe
+                </Button>
+              </Link>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Tabs */}

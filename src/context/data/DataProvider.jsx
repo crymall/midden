@@ -21,6 +21,15 @@ export const DataProvider = ({ children }) => {
   const [comboboxListsLastFetched, setComboboxListsLastFetched] = useState(0);
   const [currentComboboxQuery, setCurrentComboboxQuery] = useState("");
   const [comboboxListsUserId, setComboboxListsUserId] = useState(null);
+  const [followers, setFollowers] = useState([]);
+  const [following, setFollowing] = useState([]);
+  const [friends, setFriends] = useState([]);
+  const [relationshipsLoading, setRelationshipsLoading] = useState(false);
+  const [threads, setThreads] = useState([]);
+  const [currentConversation, setCurrentConversation] = useState([]);
+  const [messagesLoading, setMessagesLoading] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
 
   const fetchUsers = useCallback(async () => {
     setUsersLoading(true);
@@ -226,6 +235,106 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+  const getFollowers = useCallback(async (id) => {
+    setRelationshipsLoading(true);
+    try {
+      const data = await canteenApi.fetchFollowers(id);
+      setFollowers(data);
+    } catch (err) {
+      console.error("Fetch followers failed", err);
+    } finally {
+      setRelationshipsLoading(false);
+    }
+  }, []);
+
+  const getFollowing = useCallback(async (id) => {
+    setRelationshipsLoading(true);
+    try {
+      const data = await canteenApi.fetchFollowing(id);
+      setFollowing(data);
+    } catch (err) {
+      console.error("Fetch following failed", err);
+    } finally {
+      setRelationshipsLoading(false);
+    }
+  }, []);
+
+  const getFriends = useCallback(async (id) => {
+    setRelationshipsLoading(true);
+    try {
+      const data = await canteenApi.fetchFriends(id);
+      setFriends(data);
+    } catch (err) {
+      console.error("Fetch friends failed", err);
+    } finally {
+      setRelationshipsLoading(false);
+    }
+  }, []);
+
+  const followUser = async (id) => {
+    try {
+      await canteenApi.followUser(id);
+    } catch (err) {
+      console.error("Follow user failed", err);
+    }
+  };
+
+  const unfollowUser = async (id) => {
+    try {
+      await canteenApi.unfollowUser(id);
+    } catch (err) {
+      console.error("Unfollow user failed", err);
+    }
+  };
+
+  const getThreads = useCallback(async (limit = 50, offset = 0) => {
+    setMessagesLoading(true);
+    try {
+      const data = await canteenApi.fetchThreads(limit, offset);
+      setThreads(data);
+    } catch (err) {
+      console.error("Fetch threads failed", err);
+    } finally {
+      setMessagesLoading(false);
+    }
+  }, []);
+
+  const getConversation = useCallback(async (otherUserId, limit = 50, offset = 0) => {
+    setMessagesLoading(true);
+    try {
+      const data = await canteenApi.fetchConversation(otherUserId, limit, offset);
+      setCurrentConversation(data);
+    } catch (err) {
+      console.error("Fetch conversation failed", err);
+    } finally {
+      setMessagesLoading(false);
+    }
+  }, []);
+
+  const sendMessage = async (receiverId, content, recipeId = null, listId = null) => {
+    try {
+      const data = await canteenApi.sendMessage(receiverId, content, recipeId, listId);
+      // Optimistically add to current conversation if we are viewing it
+      setCurrentConversation((prev) => [data, ...prev]);
+      return data;
+    } catch (err) {
+      console.error("Send message failed", err);
+      throw err;
+    }
+  };
+
+  const getNotifications = useCallback(async (limit = 50, offset = 0) => {
+    setNotificationsLoading(true);
+    try {
+      const data = await canteenApi.fetchNotifications(limit, offset);
+      setNotifications(data);
+    } catch (err) {
+      console.error("Fetch notifications failed", err);
+    } finally {
+      setNotificationsLoading(false);
+    }
+  }, []);
+
   return (
     <DataContext.Provider
       value={{
@@ -261,6 +370,24 @@ export const DataProvider = ({ children }) => {
         createRecipe,
         createTag,
         createIngredient,
+        followers,
+        following,
+        friends,
+        relationshipsLoading,
+        getFollowers,
+        getFollowing,
+        getFriends,
+        followUser,
+        unfollowUser,
+        threads,
+        currentConversation,
+        messagesLoading,
+        getThreads,
+        getConversation,
+        sendMessage,
+        notifications,
+        notificationsLoading,
+        getNotifications,
         canteenApi,
       }}
     >

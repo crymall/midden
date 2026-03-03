@@ -31,12 +31,32 @@ vi.mock("../../../components/MiddenModal", () => ({
 describe("UserProfile", () => {
   const mockCanteenApi = {
     fetchUser: vi.fn(),
+    createList: vi.fn(),
   };
   const mockGetUserProfileRecipes = vi.fn();
   const mockGetUserLists = vi.fn().mockResolvedValue([]);
+  const mockGetFollowers = vi.fn();
+  const mockGetFollowing = vi.fn();
+  const mockFollowUser = vi.fn();
+  const mockUnfollowUser = vi.fn();
 
   const defaultUser = { id: 1, username: "TestUser" };
   const viewedUser = { id: 2, username: "ViewedUser" };
+
+  const defaultContext = {
+    canteenApi: mockCanteenApi,
+    getUserProfileRecipes: mockGetUserProfileRecipes,
+    userProfileRecipes: [],
+    getUserLists: mockGetUserLists,
+    userLists: [],
+    recipesLoading: false,
+    followers: [],
+    following: [],
+    getFollowers: mockGetFollowers,
+    getFollowing: mockGetFollowing,
+    followUser: mockFollowUser,
+    unfollowUser: mockUnfollowUser,
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -45,14 +65,7 @@ describe("UserProfile", () => {
       user: defaultUser,
     });
 
-    useData.mockReturnValue({
-      canteenApi: mockCanteenApi,
-      getUserProfileRecipes: mockGetUserProfileRecipes,
-      userProfileRecipes: [],
-      getUserLists: mockGetUserLists,
-      userLists: [],
-      recipesLoading: false,
-    });
+    useData.mockReturnValue(defaultContext);
 
     mockCanteenApi.fetchUser.mockResolvedValue(viewedUser);
   });
@@ -78,6 +91,10 @@ describe("UserProfile", () => {
     await waitFor(() => {
       expect(screen.getByText("ViewedUser")).toBeInTheDocument();
     });
+    // Check for relationship data fetching
+    expect(mockGetFollowers).toHaveBeenCalledWith("2");
+    expect(mockGetFollowing).toHaveBeenCalledWith("2");
+
     expect(screen.getByText("ViewedUser's Recipes")).toBeInTheDocument();
   });
 
@@ -89,7 +106,7 @@ describe("UserProfile", () => {
     });
   });
 
-  it("fetches recipes on mount", async () => {
+  it("fetches recipes for the user on mount", async () => {
     renderComponent();
     await waitFor(() => {
       expect(mockGetUserProfileRecipes).toHaveBeenCalledWith("2", 20, 0);
@@ -153,5 +170,83 @@ describe("UserProfile", () => {
       fireEvent.click(screen.getByText("+ List"));
     });
     expect(screen.getByTestId("midden-modal")).toBeInTheDocument();
+  });
+
+  describe("Relationships", () => {
+    it("displays follower and following counts", async () => {
+      useData.mockReturnValue({
+        ...defaultContext,
+        followers: [{ id: 3, username: "Follower1" }],
+        following: [
+          { id: 4, username: "Following1" },
+          { id: 5, username: "Following2" },
+        ],
+      });
+
+      renderComponent();
+      await waitFor(() =>
+        expect(screen.getByText("ViewedUser")).toBeInTheDocument(),
+      );
+
+      expect(screen.getByText("1")).toBeInTheDocument();
+      expect(screen.getByText(/Followers/)).toBeInTheDocument();
+      expect(screen.getByText("2")).toBeInTheDocument();
+      expect(screen.getByText(/Following/)).toBeInTheDocument();
+    });
+
+    it("shows Follow button for other users", async () => {
+      renderComponent("2");
+      await waitFor(() =>
+        expect(screen.getByText("ViewedUser")).toBeInTheDocument(),
+      );
+      expect(
+        screen.getByRole("button", { name: "Follow" }),
+      ).toBeInTheDocument();
+    });
+
+    it("shows Unfollow button if already following", async () => {
+      useData.mockReturnValue({
+        ...defaultContext,
+        followers: [{ id: 1, username: "TestUser" }], // Current user is a follower
+      });
+
+      renderComponent("2");
+      await waitFor(() =>
+        expect(screen.getByText("ViewedUser")).toBeInTheDocument(),
+      );
+      expect(
+        screen.getByRole("button", { name: "Unfollow" }),
+      ).toBeInTheDocument();
+    });
+
+    it("calls followUser and refreshes followers on follow button click", async () => {
+      renderComponent("2");
+      await waitFor(() =>
+        expect(screen.getByText("ViewedUser")).toBeInTheDocument(),
+      );
+
+      const followButton = screen.getByRole("button", { name: "Follow" });
+      fireEvent.click(followButton);
+
+      expect(mockFollowUser).toHaveBeenCalledWith("2");
+      // It's called once on mount, and once after the toggle
+      await waitFor(() => {
+        expect(mockGetFollowers).toHaveBeenCalledTimes(2);
+      });
+    });
+
+    it("calls unfollowUser and refreshes followers on unfollow button click", async () => {
+      useData.mockReturnValue({
+        ...defaultContext,
+        followers: [{ id: 1, username: "TestUser" }], // Current user is a follower
+      });
+      renderComponent("2");
+      await waitFor(() => screen.getByText("Unfollow"));
+      fireEvent.click(screen.getByText("Unfollow"));
+      expect(mockUnfollowUser).toHaveBeenCalledWith("2");
+      await waitFor(() => {
+        expect(mockGetFollowers).toHaveBeenCalledTimes(2);
+      });
+    });
   });
 });

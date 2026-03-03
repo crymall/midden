@@ -184,3 +184,59 @@ export const fetchUser = async (id) => {
   const response = await canteenApi.get(`/users/${id}`);
   return response.data;
 };
+
+export const followUser = async (id) => {
+  const response = await canteenApi.post(`/relationships/${id}`);
+  return response.data;
+};
+
+export const unfollowUser = async (id) => {
+  const response = await canteenApi.delete(`/relationships/${id}`);
+  return response.data;
+};
+
+export const fetchFollowers = async (id) => {
+  const response = await canteenApi.get(`/relationships/${id}/followers`);
+  return response.data;
+};
+
+export const fetchFollowing = async (id) => {
+  const response = await canteenApi.get(`/relationships/${id}/following`);
+  return response.data;
+};
+
+export const fetchFriends = async (id) => {
+  const response = await canteenApi.get(`/relationships/${id}/friends`);
+  return response.data;
+};
+
+export const sendMessage = async (receiverId, content, recipeId, listId) => {
+  const response = await canteenApi.post("/messages", {
+    receiver_id: receiverId,
+    content,
+    recipe_id: recipeId,
+    list_id: listId,
+  });
+  return response.data;
+};
+
+export const fetchThreads = async (limit, offset) => {
+  const response = await canteenApi.get("/messages/threads", {
+    params: { limit, offset },
+  });
+  return response.data;
+};
+
+export const fetchConversation = async (otherUserId, limit, offset) => {
+  const response = await canteenApi.get(`/messages/${otherUserId}`, {
+    params: { limit, offset },
+  });
+  return response.data;
+};
+
+export const fetchNotifications = async (limit, offset) => {
+  const response = await canteenApi.get("/notifications", {
+    params: { limit, offset },
+  });
+  return response.data;
+};

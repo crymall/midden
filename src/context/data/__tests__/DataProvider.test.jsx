@@ -264,4 +264,133 @@ describe("DataProvider", () => {
       expect(result.current.ingredients[0]).toEqual(newIngredient);
     });
   });
+
+  describe("Relationships", () => {
+    it("fetches followers and updates state", async () => {
+      const mockFollowers = [{ id: "u2", username: "User2" }];
+      canteenApi.fetchFollowers.mockResolvedValue(mockFollowers);
+
+      const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+      const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+      await act(async () => {
+        await result.current.getFollowers("u1");
+      });
+
+      expect(result.current.followers).toEqual(mockFollowers);
+      expect(canteenApi.fetchFollowers).toHaveBeenCalledWith("u1");
+    });
+
+    it("fetches following and updates state", async () => {
+      const mockFollowing = [{ id: "u3", username: "User3" }];
+      canteenApi.fetchFollowing.mockResolvedValue(mockFollowing);
+
+      const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+      const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+      await act(async () => {
+        await result.current.getFollowing("u1");
+      });
+
+      expect(result.current.following).toEqual(mockFollowing);
+      expect(canteenApi.fetchFollowing).toHaveBeenCalledWith("u1");
+    });
+
+    it("fetches friends and updates state", async () => {
+      const mockFriends = [{ id: "u4", username: "User4" }];
+      canteenApi.fetchFriends.mockResolvedValue(mockFriends);
+
+      const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+      const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+      await act(async () => {
+        await result.current.getFriends("u1");
+      });
+
+      expect(result.current.friends).toEqual(mockFriends);
+      expect(canteenApi.fetchFriends).toHaveBeenCalledWith("u1");
+    });
+
+    it("follows and unfollows user", async () => {
+      canteenApi.followUser.mockResolvedValue({});
+      canteenApi.unfollowUser.mockResolvedValue({});
+
+      const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+      const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+      await act(async () => {
+        await result.current.followUser("u5");
+        await result.current.unfollowUser("u5");
+      });
+
+      expect(canteenApi.followUser).toHaveBeenCalledWith("u5");
+      expect(canteenApi.unfollowUser).toHaveBeenCalledWith("u5");
+    });
+  });
+
+  describe("Messages", () => {
+    it("fetches threads and updates state", async () => {
+      const mockThreads = [{ id: 1, content: "Hello" }];
+      canteenApi.fetchThreads.mockResolvedValue(mockThreads);
+
+      const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+      const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+      await act(async () => {
+        await result.current.getThreads(20, 0);
+      });
+
+      expect(result.current.threads).toEqual(mockThreads);
+      expect(canteenApi.fetchThreads).toHaveBeenCalledWith(20, 0);
+    });
+
+    it("fetches conversation and updates state", async () => {
+      const mockConversation = [{ id: 1, content: "Hi there" }];
+      canteenApi.fetchConversation.mockResolvedValue(mockConversation);
+
+      const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+      const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+      await act(async () => {
+        await result.current.getConversation("u2", 20, 0);
+      });
+
+      expect(result.current.currentConversation).toEqual(mockConversation);
+      expect(canteenApi.fetchConversation).toHaveBeenCalledWith("u2", 20, 0);
+    });
+
+    it("sends message and updates current conversation", async () => {
+      const newMessage = { id: 2, content: "New message" };
+      canteenApi.sendMessage.mockResolvedValue(newMessage);
+
+      const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+      const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+      // Send message
+      await act(async () => {
+        await result.current.sendMessage("u2", "New message");
+      });
+
+      expect(canteenApi.sendMessage).toHaveBeenCalledWith("u2", "New message", null, null);
+      // Check optimistic update
+      expect(result.current.currentConversation).toContainEqual(newMessage);
+    });
+  });
+
+  describe("Notifications", () => {
+    it("fetches notifications and updates state", async () => {
+      const mockNotifications = [{ type: "message", id: "1" }];
+      canteenApi.fetchNotifications.mockResolvedValue(mockNotifications);
+
+      const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+      const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+      await act(async () => {
+        await result.current.getNotifications(20, 0);
+      });
+
+      expect(result.current.notifications).toEqual(mockNotifications);
+      expect(canteenApi.fetchNotifications).toHaveBeenCalledWith(20, 0);
+    });
+  });
 });
