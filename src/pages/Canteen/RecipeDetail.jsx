@@ -152,9 +152,7 @@ const RecipeDetail = () => {
             <span className="text-grey block text-xs tracking-wider uppercase">
               Servings
             </span>
-            <span className="text-xl font-bold">
-              {currentRecipe.servings}
-            </span>
+            <span className="text-xl font-bold">{currentRecipe.servings}</span>
           </div>
         </div>
 

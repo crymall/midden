@@ -106,16 +106,19 @@ describe("UserProfile", () => {
     });
   });
 
-  it("fetches recipes for the user on mount", async () => {
+  it("fetches recipes for the user on mount but not lists", async () => {
     renderComponent();
     await waitFor(() => {
       expect(mockGetUserProfileRecipes).toHaveBeenCalledWith("2", 20, 0);
     });
+    expect(mockGetUserLists).not.toHaveBeenCalled();
   });
 
   it("switches tabs and fetches lists", async () => {
     renderComponent();
     await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
+
+    expect(mockGetUserLists).not.toHaveBeenCalled();
 
     const listsTab = screen.getByText("ViewedUser's Lists");
     await act(async () => {

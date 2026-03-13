@@ -16,6 +16,8 @@ import MyLists from "./pages/Canteen/MyLists";
 import ListView from "./pages/Canteen/ListView";
 import { navMeta } from "./utils/constants";
 import UserProfile from "./pages/Canteen/UserProfile";
+import Messages from "./pages/Canteen/Messages";
+import Conversation from "./pages/Canteen/Conversation";
 
 function App() {
   return (
@@ -38,6 +40,8 @@ function App() {
                 <Route path="recipes/new" element={<NewRecipe />} />
                 <Route path="my-lists" element={<MyLists />} />
                 <Route path="my-lists/:id" element={<ListView />} />
+                <Route path="messages" element={<Messages />} />
+                <Route path="messages/:id" element={<Conversation />} />
               </Route>
 
               <Route path="*" element={<NotFound />} />

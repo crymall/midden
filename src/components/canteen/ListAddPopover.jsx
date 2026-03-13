@@ -130,6 +130,7 @@ const ListAddPopover = ({
                   placeholder="Search or create list..."
                   onChange={handleQueryChange}
                   autoComplete="off"
+                  type="search"
                   autoFocus
                 />
                 {(comboboxLists.length > 0 || query.length > 0) && (

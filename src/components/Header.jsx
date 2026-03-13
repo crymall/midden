@@ -50,15 +50,26 @@ const Header = ({ user, logout, title, titleLink, navLinks }) => {
       >
         🛠
       </Button>
-      <Button
-        onClick={() => {
-          logout();
-        }}
-        aria-label="Logout"
-        className="bg-grey hover:bg-lightGrey text-dark px-3 py-1 text-2xl transition-colors"
-      >
-        🚪→
-      </Button>
+      {title !== "Midden" && (
+        <Button
+          onClick={() => navigate("/")}
+          aria-label="Back to Midden"
+          className="bg-grey hover:bg-lightGrey text-dark px-3 py-1 text-2xl transition-colors"
+        >
+          ⬆
+        </Button>
+      )}
+      {title === "Midden" && (
+        <Button
+          onClick={() => {
+            logout();
+          }}
+          aria-label="Logout"
+          className="bg-grey hover:bg-lightGrey text-dark px-3 py-1 text-2xl transition-colors"
+        >
+          🚪→
+        </Button>
+      )}
     </>
   );
 
@@ -66,17 +77,23 @@ const Header = ({ user, logout, title, titleLink, navLinks }) => {
     <header className="bg-primary border-accent flex items-center justify-between border-b-4 border-dashed p-4">
       <div className="flex items-center gap-4">
         <div className="xl:hidden">
-          {processedNavLinks.length && <MobileBurgerMenu navLinks={processedNavLinks} />}
+          {processedNavLinks.length && (
+            <MobileBurgerMenu navLinks={processedNavLinks} />
+          )}
         </div>
 
         <h1
           onClick={() => navigate(titleLink)}
-          className="font-gothic hover:text-lightestGrey text-shadow-hard-grey cursor-pointer text-5xl tracking-wide text-white transition-colors text-shadow-lg"
+          className="font-gothic hover:text-lightestGrey text-shadow-hard-grey cursor-pointer text-3xl tracking-wide text-white transition-colors text-shadow-lg sm:text-5xl"
         >
           {title}
         </h1>
 
-        {processedNavLinks.length && <nav className="ml-24 hidden items-center gap-16 xl:flex">{desktopNavLinks}</nav>}
+        {processedNavLinks.length && (
+          <nav className="ml-24 hidden items-center gap-16 xl:flex">
+            {desktopNavLinks}
+          </nav>
+        )}
       </div>
       <div className="flex items-center gap-4 font-mono">
         {user ? (

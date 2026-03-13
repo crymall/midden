@@ -1,11 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as api from "../canteenApi";
 
-const { mockGet, mockPost, mockPut, mockDelete, mockUse } = vi.hoisted(() => ({
+const { mockGet, mockPost, mockPut, mockDelete, mockPatch, mockUse } = vi.hoisted(() => ({
   mockGet: vi.fn(),
   mockPost: vi.fn(),
   mockPut: vi.fn(),
   mockDelete: vi.fn(),
+  mockPatch: vi.fn(),
   mockUse: vi.fn(),
 }));
 
@@ -16,6 +17,7 @@ vi.mock("axios", () => ({
       post: mockPost,
       put: mockPut,
       delete: mockDelete,
+      patch: mockPatch,
       interceptors: {
         request: { use: mockUse },
       },
@@ -30,6 +32,7 @@ describe("canteenApi", () => {
     mockPost.mockResolvedValue({ data: {} });
     mockPut.mockResolvedValue({ data: {} });
     mockDelete.mockResolvedValue({ data: {} });
+    mockPatch.mockResolvedValue({ data: {} });
   });
 
   describe("Interceptors", () => {
@@ -282,13 +285,13 @@ describe("canteenApi", () => {
         params: { limit: 20, offset: 0 },
       });
     });
-  });
 
-  describe("Notifications", () => {
-    it("fetchNotifications calls get", async () => {
-      await api.fetchNotifications(20, 0);
-      expect(mockGet).toHaveBeenCalledWith("/notifications", {
-        params: { limit: 20, offset: 0 },
+    it("markMessagesAsRead calls put with correct data", async () => {
+      const ids = [1, 2, 3];
+      await api.markMessagesAsRead(ids);
+      expect(mockPut).toHaveBeenCalledWith("/messages/read", {
+        message_ids: ids,
+        is_read: true,
       });
     });
   });

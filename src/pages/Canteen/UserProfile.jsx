@@ -61,19 +61,19 @@ const UserProfile = () => {
   }, [id, canteenApi, getFollowers, getFollowing]);
 
   useEffect(() => {
-    if (id) {
+    if (id && activeTab === "recipes") {
       getUserProfileRecipes(id, recipeLimit, (recipePage - 1) * recipeLimit);
     }
-  }, [id, recipePage, recipeLimit, getUserProfileRecipes]);
+  }, [id, recipePage, recipeLimit, getUserProfileRecipes, activeTab]);
 
   useEffect(() => {
-    if (id) {
+    if (id && activeTab === "lists") {
       setListsLoading(true);
       getUserLists(id, listLimit, (listPage - 1) * listLimit).finally(() =>
         setListsLoading(false),
       );
     }
-  }, [id, listPage, listLimit, getUserLists]);
+  }, [id, listPage, listLimit, getUserLists, activeTab]);
 
   const handleCreateList = async (name) => {
     setCreatingList(true);

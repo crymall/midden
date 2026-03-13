@@ -234,9 +234,10 @@ export const fetchConversation = async (otherUserId, limit, offset) => {
   return response.data;
 };
 
-export const fetchNotifications = async (limit, offset) => {
-  const response = await canteenApi.get("/notifications", {
-    params: { limit, offset },
+export const markMessagesAsRead = async (messageIds, isRead = true) => {
+  const response = await canteenApi.put("/messages/read", {
+    message_ids: messageIds,
+    is_read: isRead,
   });
   return response.data;
 };

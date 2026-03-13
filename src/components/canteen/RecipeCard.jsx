@@ -4,7 +4,6 @@ import ListAddPopover from "./ListAddPopover";
 import { PERMISSIONS } from "../../utils/constants";
 
 const RecipeCard = ({ recipe }) => {
-
   const truncateDescription = (text) => {
     if (!text) return "";
     if (text.length <= 150) return text;
@@ -24,42 +23,42 @@ const RecipeCard = ({ recipe }) => {
         </Link>
 
         <div className="pointer-events-none relative z-10 flex items-start justify-between gap-2">
-        <h3 className="font-mono text-xl font-bold text-white transition-colors group-hover:text-lightestGrey">
-          {recipe.title}
-        </h3>
-        {recipe.likes && recipe.likes.length > 0 && (
-          <span className="text-accent text-xs font-mono font-bold">
-            ♥ {recipe.likes.length}
-          </span>
-        )}
-      </div>
-
-      <p className="text-lightGrey pointer-events-none relative z-10 mb-2 font-mono text-sm">
-        {truncateDescription(recipe.description)}
-      </p>
-
-      <div className="pointer-events-none relative z-10 mt-auto flex flex-wrap items-end justify-between gap-2">
-        <div className="flex flex-wrap gap-2">
-        {recipe.tags &&
-          recipe.tags.map((tag) => (
-            <span
-              key={tag.id}
-              className="bg-accent/30 text-lightestGrey border-accent/50 border px-2 py-0.5 text-xs font-bold"
-            >
-              {tag.name}
+          <h3 className="group-hover:text-lightestGrey font-mono text-xl font-bold text-white transition-colors">
+            {recipe.title}
+          </h3>
+          {recipe.likes && recipe.likes.length > 0 && (
+            <span className="text-accent font-mono text-xs font-bold whitespace-nowrap shrink-0">
+              ♥ {recipe.likes.length}
             </span>
-          ))}
+          )}
         </div>
-        <Can perform={PERMISSIONS.writeData}>
-          <ListAddPopover
-            recipeId={recipe.id}
-            className="pointer-events-auto relative z-20"
-            buttonClassName="bg-grey hover:bg-lightGrey text-dark px-2 py-1 text-xs font-bold transition-colors focus:outline-none"
-            panelClassName="right-0 bottom-full mb-2"
-            label="+ Add"
-          />
-        </Can>
-      </div>
+
+        <p className="text-lightGrey pointer-events-none relative z-10 mb-2 font-mono text-sm">
+          {truncateDescription(recipe.description)}
+        </p>
+
+        <div className="pointer-events-none relative z-10 mt-auto flex items-end justify-between gap-4">
+          <div className="pointer-events-auto flex flex-1 min-w-0 gap-2 overflow-x-auto [mask-image:linear-gradient(to_right,black_calc(100%_-_2rem),transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,black_calc(100%_-_2rem),transparent_100%)] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            {recipe.tags &&
+              recipe.tags.map((tag) => (
+                <span
+                  key={tag.id}
+                  className="bg-accent/30 text-lightestGrey border-accent/50 whitespace-nowrap border px-2 py-0.5 text-xs font-bold"
+                >
+                  {tag.name}
+                </span>
+              ))}
+          </div>
+          <Can perform={PERMISSIONS.writeData}>
+            <ListAddPopover
+              recipeId={recipe.id}
+              className="pointer-events-auto relative z-20 shrink-0"
+              buttonClassName="bg-grey hover:bg-lightGrey text-dark px-2 py-1 text-xs font-bold transition-colors focus:outline-none"
+              panelClassName="right-0 bottom-full mb-2"
+              label="+ Add"
+            />
+          </Can>
+        </div>
       </div>
     </>
   );

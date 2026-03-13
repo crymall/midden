@@ -28,8 +28,6 @@ export const DataProvider = ({ children }) => {
   const [threads, setThreads] = useState([]);
   const [currentConversation, setCurrentConversation] = useState([]);
   const [messagesLoading, setMessagesLoading] = useState(false);
-  const [notifications, setNotifications] = useState([]);
-  const [notificationsLoading, setNotificationsLoading] = useState(false);
 
   const fetchUsers = useCallback(async () => {
     setUsersLoading(true);
@@ -323,17 +321,34 @@ export const DataProvider = ({ children }) => {
     }
   };
 
-  const getNotifications = useCallback(async (limit = 50, offset = 0) => {
-    setNotificationsLoading(true);
+  const markMessagesAsRead = async (ids) => {
     try {
-      const data = await canteenApi.fetchNotifications(limit, offset);
-      setNotifications(data);
+      await canteenApi.markMessagesAsRead(ids);
+
+      const sendersToUpdate = new Set();
+      currentConversation.forEach((msg) => {
+        if (ids.includes(msg.id)) {
+          sendersToUpdate.add(String(msg.sender_id));
+        }
+      });
+
+      setCurrentConversation((prev) =>
+        prev.map((msg) => (ids.includes(msg.id) ? { ...msg, is_read: true } : msg))
+      );
+
+      if (sendersToUpdate.size > 0) {
+        setThreads((prev) =>
+          prev.map((thread) =>
+            sendersToUpdate.has(String(thread.other_user_id))
+              ? { ...thread, is_read: true }
+              : thread,
+          ),
+        );
+      }
     } catch (err) {
-      console.error("Fetch notifications failed", err);
-    } finally {
-      setNotificationsLoading(false);
+      console.error("Mark messages read failed", err);
     }
-  }, []);
+  };
 
   return (
     <DataContext.Provider
@@ -385,9 +400,7 @@ export const DataProvider = ({ children }) => {
         getThreads,
         getConversation,
         sendMessage,
-        notifications,
-        notificationsLoading,
-        getNotifications,
+        markMessagesAsRead,
         canteenApi,
       }}
     >

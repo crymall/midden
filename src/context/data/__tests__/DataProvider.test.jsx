@@ -375,22 +375,29 @@ describe("DataProvider", () => {
       // Check optimistic update
       expect(result.current.currentConversation).toContainEqual(newMessage);
     });
-  });
 
-  describe("Notifications", () => {
-    it("fetches notifications and updates state", async () => {
-      const mockNotifications = [{ type: "message", id: "1" }];
-      canteenApi.fetchNotifications.mockResolvedValue(mockNotifications);
+    it("marks messages as read and updates state", async () => {
+      const initialConversation = [
+        { id: 1, content: "Msg 1", is_read: false },
+        { id: 2, content: "Msg 2", is_read: false },
+      ];
+      canteenApi.fetchConversation.mockResolvedValue(initialConversation);
+      canteenApi.markMessagesAsRead.mockResolvedValue({});
 
       const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
       const { result } = renderHook(() => useContext(DataContext), { wrapper });
 
       await act(async () => {
-        await result.current.getNotifications(20, 0);
+        await result.current.getConversation("u2", 20, 0);
       });
 
-      expect(result.current.notifications).toEqual(mockNotifications);
-      expect(canteenApi.fetchNotifications).toHaveBeenCalledWith(20, 0);
+      await act(async () => {
+        await result.current.markMessagesAsRead([1]);
+      });
+
+      expect(canteenApi.markMessagesAsRead).toHaveBeenCalledWith([1]);
+      expect(result.current.currentConversation.find((m) => m.id === 1).is_read).toBe(true);
+      expect(result.current.currentConversation.find((m) => m.id === 2).is_read).toBe(false);
     });
   });
 });

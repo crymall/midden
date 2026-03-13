@@ -54,6 +54,33 @@ describe("Header Component", () => {
     expect(mockNavigate).toHaveBeenCalledWith("/settings");
   });
 
+  it("renders 'Back to Midden' button and hides logout when title is not Midden", async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <Header {...defaultProps} title="Canteen" />
+      </MemoryRouter>
+    );
+
+    const backBtn = screen.getByRole("button", { name: /back to midden/i });
+    expect(backBtn).toBeInTheDocument();
+    expect(backBtn).toHaveTextContent("⬆");
+
+    expect(screen.queryByRole("button", { name: /logout/i })).not.toBeInTheDocument();
+
+    await user.click(backBtn);
+    expect(mockNavigate).toHaveBeenCalledWith("/");
+  });
+
+  it("hides 'Back to Midden' button when title is Midden", () => {
+    render(
+      <MemoryRouter>
+        <Header {...defaultProps} title="Midden" />
+      </MemoryRouter>
+    );
+    expect(screen.queryByRole("button", { name: /back to midden/i })).not.toBeInTheDocument();
+  });
+
   it("calls logout without navigating when logout button is clicked", async () => {
     const user = userEvent.setup();
     render(

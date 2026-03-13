@@ -65,7 +65,7 @@ const RecipeFilter = ({ onFilter }) => {
             <Label className="text-lightestGrey mb-1 block text-sm font-bold">
               Filter by Tags
             </Label>
-            <Popover className="relative">
+            <Popover className="relative z-30">
               <PopoverButton className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey flex w-full items-center justify-between border p-2 text-left focus:outline-none">
                 <span className="truncate">
                   {selectedTags.length === 0
