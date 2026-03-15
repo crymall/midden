@@ -5,6 +5,16 @@ import MyLists from "../MyLists";
 import useData from "../../../context/data/useData";
 import useAuth from "../../../context/auth/useAuth";
 
+const mockNavigate = vi.fn();
+
+vi.mock("react-router-dom", async () => {
+  const actual = await vi.importActual("react-router-dom");
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
+
 vi.mock("../../../context/data/useData");
 vi.mock("../../../context/auth/useAuth");
 
@@ -33,6 +43,7 @@ describe("MyLists", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockNavigate.mockClear();
     useAuth.mockReturnValue({ user: defaultUser });
     useData.mockReturnValue({
       userLists: defaultLists,
@@ -126,5 +137,31 @@ describe("MyLists", () => {
       expect(mockCreateList).toHaveBeenCalledWith("New List");
       expect(mockGetUserLists).toHaveBeenCalled();
     });
+  });
+
+  it("renders back button if history exists and navigates back", async () => {
+    render(
+      <MemoryRouter initialEntries={["/", "/my-lists"]} initialIndex={1}>
+        <MyLists />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => expect(screen.getByText("Favorites")).toBeInTheDocument());
+
+    const backBtn = screen.getByRole("button", { name: "Go back" });
+    expect(backBtn).toBeInTheDocument();
+    fireEvent.click(backBtn);
+    expect(mockNavigate).toHaveBeenCalledWith(-1);
+  });
+
+  it("does not render back button if no history exists", async () => {
+    render(
+      <MemoryRouter initialEntries={["/my-lists"]} initialIndex={0}>
+        <MyLists />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => expect(screen.getByText("Favorites")).toBeInTheDocument());
+    expect(screen.queryByRole("button", { name: "Go back" })).not.toBeInTheDocument();
   });
 });

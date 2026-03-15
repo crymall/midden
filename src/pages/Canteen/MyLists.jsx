@@ -1,5 +1,5 @@
 import { useEffect, useState, useEffectEvent, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@headlessui/react";
 import useData from "../../context/data/useData";
 import useAuth from "../../context/auth/useAuth";
@@ -12,6 +12,9 @@ import CreateListModal from "../../components/canteen/CreateListModal";
 const MyLists = () => {
   const { user } = useAuth();
   const { userLists, getUserLists, canteenApi } = useData();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const hasHistory = location.key !== "default";
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [creatingList, setCreatingList] = useState(false);
   const [fetchingLists, setFetchingLists] = useState(userLists.length === 0);
@@ -84,7 +87,18 @@ const MyLists = () => {
   return (
     <MiddenCard>
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="font-gothic text-4xl font-bold text-white">My Lists</h2>
+        <div className="flex items-center gap-4">
+          {hasHistory && (
+            <button
+              onClick={() => navigate(-1)}
+              className="text-white hover:text-accent text-3xl leading-none transition-colors focus:outline-none"
+              aria-label="Go back"
+            >
+              ←
+            </button>
+          )}
+          <h2 className="font-gothic text-4xl font-bold text-white">My Lists</h2>
+        </div>
         <Button
           onClick={() => setIsCreateModalOpen(true)}
           className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-white transition-colors"
