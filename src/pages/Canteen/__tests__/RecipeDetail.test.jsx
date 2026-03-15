@@ -28,6 +28,14 @@ vi.mock("../../../components/canteen/ListAddPopover", () => ({
   ),
 }));
 
+vi.mock("../../../components/canteen/ShareRecipePopover", () => ({
+  default: ({ recipe, label }) => (
+    <button data-testid="share-recipe-popover" data-recipe-id={recipe.id}>
+      {label}
+    </button>
+  ),
+}));
+
 vi.mock("@headlessui/react", async () => {
   const actual = await vi.importActual("@headlessui/react");
   return {
@@ -139,5 +147,13 @@ describe("RecipeDetail", () => {
     expect(popover).toBeInTheDocument();
     expect(popover).toHaveAttribute("data-recipe-id", "123");
     expect(popover).toHaveTextContent("+ Add to List");
+  });
+
+  it("renders share recipe popover", () => {
+    render(<RecipeDetail />);
+    const sharePopover = screen.getByTestId("share-recipe-popover");
+    expect(sharePopover).toBeInTheDocument();
+    expect(sharePopover).toHaveAttribute("data-recipe-id", "123");
+    expect(sharePopover).toHaveTextContent("Share");
   });
 });

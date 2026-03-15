@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import ListList from "./ListList";
+import ListList from "../ListList";
 
 describe("ListList", () => {
   const mockHandleDeleteList = vi.fn();

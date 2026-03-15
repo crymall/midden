@@ -6,6 +6,7 @@ import useAuth from "../../context/auth/useAuth";
 import MiddenCard from "../../components/MiddenCard";
 import Can from "../../components/gateways/Can";
 import ListAddPopover from "../../components/canteen/ListAddPopover";
+import ShareRecipePopover from "../../components/canteen/ShareRecipePopover";
 import { PERMISSIONS } from "../../utils/constants";
 
 const RecipeDetail = () => {
@@ -99,7 +100,7 @@ const RecipeDetail = () => {
               <div className="flex gap-2">
                 <Button
                   onClick={handleLike}
-                  className={`border px-2 py-1 font-bold transition-colors ${
+                  className={`flex h-8 items-center justify-center border px-3 text-sm font-bold transition-colors ${
                     isLiked
                       ? "bg-accent border-accent text-white"
                       : "text-lightestGrey border-grey hover:border-lightestGrey bg-transparent"
@@ -110,9 +111,16 @@ const RecipeDetail = () => {
                 <ListAddPopover
                   recipeId={currentRecipe.id}
                   className="relative"
-                  buttonClassName="bg-grey hover:bg-lightGrey text-dark px-2 py-1 font-bold transition-colors"
+                  buttonClassName="bg-grey hover:bg-lightGrey text-dark flex h-8 items-center justify-center px-3 text-sm font-bold transition-colors"
                   panelClassName="right-0 top-full mt-2"
                   label="+ Add to List"
+                />
+                <ShareRecipePopover
+                  recipe={currentRecipe}
+                  className="relative"
+                  buttonClassName="bg-grey hover:bg-lightGrey text-dark flex h-8 items-center justify-center px-3 text-sm font-bold transition-colors"
+                  panelClassName="right-0 top-full mt-2"
+                  label="Share"
                 />
               </div>
             </Can>

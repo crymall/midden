@@ -83,6 +83,16 @@ describe("RecipeCard", () => {
     expect(screen.getByText("♥ 3")).toBeInTheDocument();
   });
 
+  it("formats large like counts compactly", () => {
+    const recipeManyLikes = { ...mockRecipe, likes: new Array(1200).fill("user") };
+    render(
+      <MemoryRouter>
+        <RecipeCard recipe={recipeManyLikes} />
+      </MemoryRouter>
+    );
+    expect(screen.getByText("♥ 1.2K")).toBeInTheDocument();
+  });
+
   it("does not render the like count when likes are empty", () => {
     const recipeNoLikes = { ...mockRecipe, likes: [] };
     render(
@@ -122,5 +132,25 @@ describe("RecipeCard", () => {
     const popover = screen.getByTestId("list-add-popover");
     expect(popover).toBeInTheDocument();
     expect(popover).toHaveAttribute("data-recipe-id", "123");
+  });
+
+  it("applies inverse styles when inverse prop is true", () => {
+    render(
+      <MemoryRouter>
+        <RecipeCard recipe={mockRecipe} inverse={true} />
+      </MemoryRouter>
+    );
+    const card = screen.getByText("Spicy Tacos").closest("div.group");
+    expect(card).toHaveClass("bg-dark/50", "border-lightestGrey");
+  });
+
+  it("applies default styles when inverse prop is false", () => {
+    render(
+      <MemoryRouter>
+        <RecipeCard recipe={mockRecipe} />
+      </MemoryRouter>
+    );
+    const card = screen.getByText("Spicy Tacos").closest("div.group");
+    expect(card).toHaveClass("bg-primary/20", "border-accent");
   });
 });

@@ -27,6 +27,17 @@ const Messages = () => {
             const isUnread =
               String(thread.sender_id) !== String(user?.id) && !thread.is_read;
 
+            let threadContent = thread.content;
+            if (thread.recipe_id) {
+              const senderName =
+                String(thread.sender_id) === String(user?.id)
+                  ? "You"
+                  : thread.other_username;
+              threadContent = `${senderName} shared a recipe${
+                thread.content ? `: ${thread.content}` : ""
+              }`;
+            }
+
             return (
               <Link
                 key={thread.other_user_id}
@@ -51,7 +62,7 @@ const Messages = () => {
                 <p
                   className={`${isUnread ? "text-white font-bold" : "text-lightGrey"} truncate font-mono text-sm`}
                 >
-                  {thread.content}
+                  {threadContent}
                 </p>
               </Link>
             );

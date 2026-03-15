@@ -99,11 +99,13 @@ describe("UserProfile", () => {
   });
 
   it("handles user not found", async () => {
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     mockCanteenApi.fetchUser.mockRejectedValue(new Error("Not found"));
     renderComponent();
     await waitFor(() => {
       expect(screen.getByText("User not found.")).toBeInTheDocument();
     });
+    consoleSpy.mockRestore();
   });
 
   it("fetches recipes for the user on mount but not lists", async () => {

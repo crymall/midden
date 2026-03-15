@@ -21,9 +21,10 @@ export const fetchRecipes = async (
   tags = [],
   ingredients = [],
   title = "",
+  ids,
 ) => {
   const response = await canteenApi.get("/recipes", {
-    params: { limit, offset, tags, ingredients, title },
+    params: { limit, offset, tags, ingredients, title, ids },
   });
   return response.data;
 };

@@ -67,13 +67,14 @@ export const DataProvider = ({ children }) => {
     async (limit = 50, offset = 0, filters = {}) => {
       setRecipesLoading(true);
       try {
-        const { tags, ingredients, title } = filters;
+        const { tags, ingredients, title, ids } = filters;
         const data = await canteenApi.fetchRecipes(
           limit,
           offset,
           tags,
           ingredients,
           title,
+          ids
         );
         setRecipes(data);
       } catch (err) {
@@ -297,24 +298,64 @@ export const DataProvider = ({ children }) => {
     }
   }, []);
 
-  const getConversation = useCallback(async (otherUserId, limit = 50, offset = 0) => {
+ const getConversation = useCallback(async (otherUserId, limit = 50, offset = 0) => {
     setMessagesLoading(true);
     try {
       const data = await canteenApi.fetchConversation(otherUserId, limit, offset);
+
+      const recipeIds = [...new Set(data.map((msg) => msg.recipe_id).filter(Boolean))];
+
+      if (recipeIds.length > 0) {
+        const fetchedRecipes = await canteenApi.fetchRecipes(
+          recipeIds.length,
+          0,
+          undefined,
+          undefined,
+          undefined,
+          recipeIds,
+        );
+
+        const recipesMap = {};
+        for (const recipe of fetchedRecipes) {
+          recipesMap[String(recipe.id)] = recipe;
+        }
+
+        for (const msg of data) {
+          if (msg.recipe_id && recipesMap[String(msg.recipe_id)]) {
+            msg.recipe = recipesMap[String(msg.recipe_id)];
+          }
+        }
+      }
+
       setCurrentConversation(data);
     } catch (err) {
       console.error("Fetch conversation failed", err);
     } finally {
       setMessagesLoading(false);
     }
-  }, []);
+  }, []); 
 
   const sendMessage = async (receiverId, content, recipeId = null, listId = null) => {
     try {
       const data = await canteenApi.sendMessage(receiverId, content, recipeId, listId);
+
+      let enrichedData = { ...data };
+      if (recipeId) {
+        if (currentRecipe && String(currentRecipe.id) === String(recipeId)) {
+          enrichedData.recipe = currentRecipe;
+        } else {
+          try {
+            const recipe = await canteenApi.fetchRecipe(recipeId);
+            enrichedData.recipe = recipe;
+          } catch (e) {
+            console.error("Failed to fetch recipe for new message", e);
+          }
+        }
+      }
+
       // Optimistically add to current conversation if we are viewing it
-      setCurrentConversation((prev) => [data, ...prev]);
-      return data;
+      setCurrentConversation((prev) => [enrichedData, ...prev]);
+      return enrichedData;
     } catch (err) {
       console.error("Send message failed", err);
       throw err;

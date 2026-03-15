@@ -139,7 +139,7 @@ describe("DataProvider", () => {
 
       expect(result.current.recipesLoading).toBe(false);
       expect(result.current.recipes).toEqual(mockRecipes);
-      expect(canteenApi.fetchRecipes).toHaveBeenCalledWith(20, 0, undefined, undefined, undefined);
+      expect(canteenApi.fetchRecipes).toHaveBeenCalledWith(20, 0, undefined, undefined, undefined, undefined);
     });
 
     it("fetches user profile recipes and updates state", async () => {
@@ -359,6 +359,30 @@ describe("DataProvider", () => {
       expect(canteenApi.fetchConversation).toHaveBeenCalledWith("u2", 20, 0);
     });
 
+    it("fetches conversation and enriches messages with recipes", async () => {
+      const mockConversation = [
+        { id: 1, content: "Look", recipe_id: "101" },
+        { id: 2, content: "No recipe" },
+      ];
+      const mockRecipes = [{ id: "101", title: "Shared Recipe" }];
+
+      canteenApi.fetchConversation.mockResolvedValue(mockConversation);
+      canteenApi.fetchRecipes.mockResolvedValue(mockRecipes);
+
+      const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+      const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+      await act(async () => {
+        await result.current.getConversation("u2", 20, 0);
+      });
+
+      expect(canteenApi.fetchRecipes).toHaveBeenCalledWith(1, 0, undefined, undefined, undefined, ["101"]);
+      expect(result.current.currentConversation).toEqual([
+        { id: 1, content: "Look", recipe_id: "101", recipe: mockRecipes[0] },
+        { id: 2, content: "No recipe" },
+      ]);
+    });
+
     it("sends message and updates current conversation", async () => {
       const newMessage = { id: 2, content: "New message" };
       canteenApi.sendMessage.mockResolvedValue(newMessage);
@@ -374,6 +398,57 @@ describe("DataProvider", () => {
       expect(canteenApi.sendMessage).toHaveBeenCalledWith("u2", "New message", null, null);
       // Check optimistic update
       expect(result.current.currentConversation).toContainEqual(newMessage);
+    });
+
+    it("sends message with recipe and enriches it from API", async () => {
+      const newMessage = { id: 3, content: "New recipe message", recipe_id: "102" };
+      const fetchedRecipe = { id: "102", title: "Fetched Recipe" };
+
+      canteenApi.sendMessage.mockResolvedValue(newMessage);
+      canteenApi.fetchRecipe.mockResolvedValue(fetchedRecipe);
+
+      const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+      const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+      await act(async () => {
+        await result.current.sendMessage("u2", "New recipe message", "102");
+      });
+
+      expect(canteenApi.sendMessage).toHaveBeenCalledWith("u2", "New recipe message", "102", null);
+      expect(canteenApi.fetchRecipe).toHaveBeenCalledWith("102");
+      expect(result.current.currentConversation).toContainEqual({
+        ...newMessage,
+        recipe: fetchedRecipe,
+      });
+    });
+
+    it("sends message with recipe and uses currentRecipe if matching", async () => {
+      const newMessage = { id: 4, content: "Current recipe message", recipe_id: "103" };
+      const currentRecipe = { id: "103", title: "Current Recipe" };
+
+      canteenApi.fetchRecipe.mockResolvedValueOnce(currentRecipe);
+      canteenApi.sendMessage.mockResolvedValue(newMessage);
+
+      const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+      const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+      // Set current recipe
+      await act(async () => {
+        await result.current.getRecipe("103");
+      });
+
+      canteenApi.fetchRecipe.mockClear();
+
+      await act(async () => {
+        await result.current.sendMessage("u2", "Current recipe message", "103");
+      });
+
+      expect(canteenApi.sendMessage).toHaveBeenCalledWith("u2", "Current recipe message", "103", null);
+      expect(canteenApi.fetchRecipe).not.toHaveBeenCalled();
+      expect(result.current.currentConversation).toContainEqual({
+        ...newMessage,
+        recipe: currentRecipe,
+      });
     });
 
     it("marks messages as read and updates state", async () => {

@@ -4,6 +4,7 @@ import { Button, Textarea, Field } from "@headlessui/react";
 import useData from "../../context/data/useData";
 import useAuth from "../../context/auth/useAuth";
 import MiddenCard from "../../components/MiddenCard";
+import RecipeCard from "../../components/canteen/RecipeCard";
 
 const Conversation = () => {
   const { id } = useParams();
@@ -47,7 +48,6 @@ const Conversation = () => {
         .map((msg) => msg.id);
 
       if (unreadIds.length > 0) {
-        console.log(unreadIds)
         markMessagesAsRead(unreadIds);
       }
     }
@@ -113,9 +113,16 @@ const Conversation = () => {
                     : "bg-grey text-dark"
                 }`}
               >
-                <p className="font-mono text-sm whitespace-pre-wrap">
-                  {msg.content}
-                </p>
+                {msg.recipe && (
+                  <div className="mb-2 max-w-sm sm:min-w-64">
+                    <RecipeCard recipe={msg.recipe} inverse={true} />
+                  </div>
+                )}
+                {msg.content && (
+                  <p className="font-mono text-sm whitespace-pre-wrap">
+                    {msg.content}
+                  </p>
+                )}
                 <span
                   className={`mt-1 block text-[10px] ${isMe ? "text-white/70" : "text-dark/70"}`}
                 >
@@ -149,7 +156,7 @@ const Conversation = () => {
           <Button
             type="submit"
             disabled={!newMessage.trim()}
-            className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-white transition-colors disabled:opacity-50"
+            className="bg-accent hover:bg-accent/80 h-12 px-4 font-bold text-white transition-colors disabled:opacity-50"
           >
             Send
           </Button>
