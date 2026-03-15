@@ -131,12 +131,12 @@ const UserProfile = () => {
 
   return (
     <MiddenCard>
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h1 className="font-gothic text-4xl font-bold text-white">
+      <div className="mb-4 flex items-center justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          <h1 className="font-gothic text-4xl font-bold text-white truncate">
             {viewedUser.username}
           </h1>
-          <div className="text-lightGrey mt-1 flex gap-4 font-mono text-sm">
+          <div className="text-lightGrey mt-1 hidden gap-4 font-mono text-sm md:flex">
             <span>
               <strong className="text-white">{followers.length}</strong>{" "}
               Followers
@@ -147,7 +147,7 @@ const UserProfile = () => {
             </span>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex shrink-0 gap-2">
           {!isOwnProfile && currentUser && (
             <Button
               onClick={handleFollowToggle}
