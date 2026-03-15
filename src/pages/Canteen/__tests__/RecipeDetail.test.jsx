@@ -4,9 +4,14 @@ import RecipeDetail from "../RecipeDetail";
 import useData from "../../../context/data/useData";
 import useAuth from "../../../context/auth/useAuth";
 
+const mockNavigate = vi.fn();
+let mockLocation = { key: "default" };
+
 vi.mock("react-router-dom", () => ({
   useParams: () => ({ id: "123" }),
   Link: ({ to, children }) => <a href={to}>{children}</a>,
+  useNavigate: () => mockNavigate,
+  useLocation: () => mockLocation,
 }));
 
 vi.mock("../../../context/data/useData");
@@ -79,6 +84,8 @@ describe("RecipeDetail", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockLocation = { key: "default" };
+    mockNavigate.mockClear();
     useData.mockReturnValue(defaultContext);
     useAuth.mockReturnValue({ user: mockUser });
   });
@@ -155,5 +162,20 @@ describe("RecipeDetail", () => {
     expect(sharePopover).toBeInTheDocument();
     expect(sharePopover).toHaveAttribute("data-recipe-id", "123");
     expect(sharePopover).toHaveTextContent("Share");
+  });
+
+  it("renders back button when history is present and navigates back", () => {
+    mockLocation = { key: "not-default" };
+    render(<RecipeDetail />);
+    const backBtn = screen.getByRole("button", { name: "Go back" });
+    expect(backBtn).toBeInTheDocument();
+    fireEvent.click(backBtn);
+    expect(mockNavigate).toHaveBeenCalledWith(-1);
+  });
+
+  it("does not render back button on direct load", () => {
+    mockLocation = { key: "default" };
+    render(<RecipeDetail />);
+    expect(screen.queryByRole("button", { name: "Go back" })).not.toBeInTheDocument();
   });
 });

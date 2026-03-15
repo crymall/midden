@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@headlessui/react";
 import useData from "../../context/data/useData";
 import useAuth from "../../context/auth/useAuth";
@@ -19,6 +19,9 @@ const RecipeDetail = () => {
     getUserLists,
   } = useData();
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const hasHistory = location.key !== "default";
 
   useEffect(() => {
     if (id) {
@@ -65,25 +68,35 @@ const RecipeDetail = () => {
   return (
     <MiddenCard>
       <div className="flex flex-col gap-6">
-        {/* Header */}
         <div className="border-grey pb-2">
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div className="flex-1">
-              <div className="mb-2 flex flex-col gap-0">
-                <h1 className="font-mono text-3xl leading-none font-bold text-white">
-                  {currentRecipe.title}
-                </h1>
-                {currentRecipe.author && (
-                  <p className="text-lightGrey font-mono text-sm">
-                    By{" "}
-                    <Link
-                      to={`/applications/canteen/user/${currentRecipe.author.id}`}
-                      className="text-accent hover:underline"
-                    >
-                      {currentRecipe.author.username}
-                    </Link>
-                  </p>
+              <div className="mb-2 flex items-start gap-4">
+                {hasHistory && (
+                  <button
+                    onClick={() => navigate(-1)}
+                    className="text-white hover:text-accent mt-0.5 text-2xl leading-none transition-colors focus:outline-none"
+                    aria-label="Go back"
+                  >
+                    ←
+                  </button>
                 )}
+                <div className="flex flex-col gap-0">
+                  <h1 className="font-mono text-3xl leading-none font-bold text-white">
+                    {currentRecipe.title}
+                  </h1>
+                  {currentRecipe.author && (
+                    <p className="text-lightGrey font-mono text-sm">
+                      By{" "}
+                      <Link
+                        to={`/applications/canteen/user/${currentRecipe.author.id}`}
+                        className="text-accent hover:underline"
+                      >
+                        {currentRecipe.author.username}
+                      </Link>
+                    </p>
+                  )}
+                </div>
               </div>
               <div className="flex flex-wrap gap-2 md:mb-4">
                 {currentRecipe.tags?.map((tag) => (
@@ -130,7 +143,6 @@ const RecipeDetail = () => {
           </p>
         </div>
 
-        {/* Time Stats */}
         <div className="text-lightestGrey grid grid-cols-2 gap-4 rounded-lg bg-white/5 p-4 text-center font-mono md:grid-cols-4">
           <div>
             <span className="text-grey block text-xs tracking-wider uppercase">
@@ -165,7 +177,6 @@ const RecipeDetail = () => {
         </div>
 
         <div className="grid gap-8 md:grid-cols-3">
-          {/* Ingredients */}
           <div className="md:col-span-1">
             <h3 className="font-gothic border-grey mb-4 border-b pb-2 text-3xl text-white">
               Ingredients
@@ -188,7 +199,6 @@ const RecipeDetail = () => {
             </ul>
           </div>
 
-          {/* Instructions */}
           <div className="md:col-span-2">
             <h3 className="font-gothic border-grey mb-4 border-b pb-2 text-3xl text-white">
               Instructions

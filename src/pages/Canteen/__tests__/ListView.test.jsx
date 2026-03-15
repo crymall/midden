@@ -1,9 +1,19 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import ListView from "../ListView";
 import useData from "../../../context/data/useData";
 import useAuth from "../../../context/auth/useAuth";
+
+const mockNavigate = vi.fn();
+
+vi.mock("react-router-dom", async () => {
+  const actual = await vi.importActual("react-router-dom");
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
 
 vi.mock("../../../context/data/useData");
 vi.mock("../../../context/auth/useAuth");
@@ -39,13 +49,14 @@ describe("ListView", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockNavigate.mockClear();
     useAuth.mockReturnValue({ user: mockUser });
     useData.mockReturnValue(defaultContext);
   });
 
-  const renderWithRouter = (listId = "1") => {
+  const renderWithRouter = (listId = "1", initialEntries = [`/lists/${listId}`], initialIndex = 0) => {
     render(
-      <MemoryRouter initialEntries={[`/lists/${listId}`]}>
+      <MemoryRouter initialEntries={initialEntries} initialIndex={initialIndex}>
         <Routes>
           <Route path="/lists/:id" element={<ListView />} />
         </Routes>
@@ -121,5 +132,29 @@ describe("ListView", () => {
     renderWithRouter("1");
     
     expect(screen.getByText("Loading List...")).toBeInTheDocument();
+  });
+
+  it("renders back button if history exists and navigates back", () => {
+    useData.mockReturnValue({
+      ...defaultContext,
+      userLists: [{ id: "1", name: "My List" }],
+    });
+    renderWithRouter("1", ["/", "/lists/1"], 1);
+
+    const backBtn = screen.getByRole("button", { name: "Go back" });
+    expect(backBtn).toBeInTheDocument();
+    fireEvent.click(backBtn);
+    expect(mockNavigate).toHaveBeenCalledWith(-1);
+  });
+
+  it("renders static link if no history exists", () => {
+    useData.mockReturnValue({
+      ...defaultContext,
+      userLists: [{ id: "1", name: "My List" }],
+    });
+    renderWithRouter("1", ["/lists/1"], 0);
+
+    expect(screen.queryByRole("button", { name: "Go back" })).not.toBeInTheDocument();
+    expect(screen.getByText("← Back to My Lists")).toBeInTheDocument();
   });
 });

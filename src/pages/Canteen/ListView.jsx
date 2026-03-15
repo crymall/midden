@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import useData from "../../context/data/useData";
 import useAuth from "../../context/auth/useAuth";
 import MiddenCard from "../../components/MiddenCard";
@@ -9,6 +9,9 @@ const ListView = () => {
   const { id } = useParams();
   const { user } = useAuth();
   const { userLists, recipesLoading, getUserLists, getListRecipes, currentListRecipes } = useData();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const hasHistory = location.key !== "default";
 
   // Find the specific list from the cached userLists in context
   const currentList = userLists.find((list) => list.id === id);
@@ -48,16 +51,31 @@ const ListView = () => {
 
   return (
     <MiddenCard>
-      <h2 className="mb-4 font-gothic text-4xl font-bold text-white">
-        {currentList?.name || "Loading List..."}
-      </h2>
-      <div className="mb-6 flex flex-col gap-2">
-        <Link
-          to="/applications/canteen/my-lists"
-          className="text-lightGrey hover:text-white font-mono text-sm transition-colors"
-        >
-          ← Back to My Lists
-        </Link>
+      <div className="mb-6">
+        <div className="flex items-center gap-4">
+          {hasHistory && (
+            <button
+              onClick={() => navigate(-1)}
+              className="text-white hover:text-accent text-3xl leading-none transition-colors focus:outline-none"
+              aria-label="Go back"
+            >
+              ←
+            </button>
+          )}
+          <h2 className="font-gothic text-4xl font-bold text-white">
+            {currentList?.name || "Loading List..."}
+          </h2>
+        </div>
+        {!hasHistory && (
+          <div className="mt-2 flex flex-col gap-2">
+            <Link
+              to="/applications/canteen/my-lists"
+              className="text-lightGrey hover:text-white font-mono text-sm transition-colors"
+            >
+              ← Back to My Lists
+            </Link>
+          </div>
+        )}
       </div>
 
       <RecipeList

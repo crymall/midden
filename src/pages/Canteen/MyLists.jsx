@@ -94,7 +94,6 @@ const MyLists = () => {
         isNextDisabled={userLists.length < limit}
       />
 
-      {/* Create List Modal */}
       <CreateListModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
@@ -102,7 +101,6 @@ const MyLists = () => {
         loading={creatingList}
       />
 
-      {/* Delete List Modal */}
       <MiddenModal
         isOpen={!!listToDelete}
         onClose={() => setListToDelete(null)}

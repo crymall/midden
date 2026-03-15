@@ -178,7 +178,6 @@ const UserProfile = () => {
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="border-grey mb-6 flex border-b">
         <button
           onClick={() => setActiveTab("recipes")}
