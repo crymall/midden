@@ -202,11 +202,13 @@ describe("DataProvider", () => {
       const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
       const { result } = renderHook(() => useContext(DataContext), { wrapper });
 
+      let data;
       await act(async () => {
-        await result.current.getRecipe("101");
+        data = await result.current.getRecipe("101");
       });
 
       expect(result.current.currentRecipe).toEqual(mockRecipe);
+      expect(data).toEqual(mockRecipe);
       expect(canteenApi.fetchRecipe).toHaveBeenCalledWith("101");
     });
 
@@ -292,6 +294,23 @@ describe("DataProvider", () => {
 
       expect(canteenApi.createIngredient).toHaveBeenCalledWith("Saffron");
       expect(result.current.ingredients[0]).toEqual(newIngredient);
+    });
+
+    it("fetches viewed user and updates state", async () => {
+      const mockUser = { id: "101", username: "Viewed" };
+      canteenApi.fetchUser.mockResolvedValue(mockUser);
+
+      const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+      const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+      let data;
+      await act(async () => {
+        data = await result.current.getViewedUser("101");
+      });
+
+      expect(result.current.viewedUser).toEqual(mockUser);
+      expect(data).toEqual(mockUser);
+      expect(canteenApi.fetchUser).toHaveBeenCalledWith("101");
     });
 
     it("fetches popular recipes and updates state", async () => {
@@ -429,6 +448,7 @@ describe("DataProvider", () => {
         canteenApi.fetchUserRecipes.mockRejectedValue(error);
         canteenApi.fetchPopularRecipes.mockRejectedValue(error);
         canteenApi.fetchRecipe.mockRejectedValue(error);
+        canteenApi.fetchUser.mockRejectedValue(error);
         canteenApi.fetchIngredients.mockRejectedValue(error);
         canteenApi.fetchTags.mockRejectedValue(error);
         canteenApi.fetchUserLists.mockRejectedValue(error);
@@ -452,6 +472,9 @@ describe("DataProvider", () => {
 
         await act(async () => { await result.current.getRecipe("1"); });
         expect(consoleSpy).toHaveBeenCalledWith("Fetch recipe failed", error);
+
+        await act(async () => { await result.current.getViewedUser("1"); });
+        expect(consoleSpy).toHaveBeenCalledWith("Fetch viewed user failed", error);
 
         await act(async () => { await result.current.getIngredients(); });
         expect(consoleSpy).toHaveBeenCalledWith("Fetch ingredients failed", error);

@@ -25,12 +25,14 @@ const UserProfile = () => {
     getFollowing,
     followUser,
     unfollowUser,
+    viewedUser,
+    viewedUserLoading,
+    getViewedUser,
   } = useData();
-  const [viewedUser, setViewedUser] = useState(null);
-  const [loadingUser, setLoadingUser] = useState(true);
   const [activeTab, setActiveTab] = useState("recipes");
   const [isCreateListOpen, setIsCreateListOpen] = useState(false);
   const [creatingList, setCreatingList] = useState(false);
+  const [fetchFailed, setFetchFailed] = useState(false);
 
   // Pagination State
   const [recipePage, setRecipePage] = useState(1);
@@ -40,25 +42,17 @@ const UserProfile = () => {
   const [listsLoading, setListsLoading] = useState(false);
 
   useEffect(() => {
-    const loadData = async () => {
-      if (id) {
-        setLoadingUser(true);
-        try {
-          const [userData] = await Promise.all([
-            canteenApi.fetchUser(id),
-            getFollowers(id),
-            getFollowing(id),
-          ]);
-          setViewedUser(userData);
-        } catch (error) {
-          console.error("Failed to load user profile data", error);
-        } finally {
-          setLoadingUser(false);
-        }
+    if (id) {
+      if (String(viewedUser?.id) !== String(id)) {
+        setFetchFailed(false);
+        getViewedUser(id).then((res) => {
+          if (!res) setFetchFailed(true);
+        });
       }
-    };
-    loadData();
-  }, [id, canteenApi, getFollowers, getFollowing]);
+      getFollowers(id);
+      getFollowing(id);
+    }
+  }, [id, viewedUser?.id, getViewedUser, getFollowers, getFollowing]);
 
   useEffect(() => {
     if (id && activeTab === "recipes") {
@@ -107,7 +101,7 @@ const UserProfile = () => {
     getFollowers(id);
   };
 
-  if (loadingUser) {
+  if (viewedUserLoading || (String(viewedUser?.id) !== String(id) && !fetchFailed)) {
     return (
       <MiddenCard>
         <div className="flex justify-center p-8">
@@ -119,7 +113,7 @@ const UserProfile = () => {
     );
   }
 
-  if (!viewedUser) {
+  if (fetchFailed || !viewedUser) {
     return (
       <MiddenCard>
         <div className="flex justify-center p-8">

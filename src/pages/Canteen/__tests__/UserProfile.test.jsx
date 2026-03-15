@@ -30,7 +30,6 @@ vi.mock("../../../components/MiddenModal", () => ({
 
 describe("UserProfile", () => {
   const mockCanteenApi = {
-    fetchUser: vi.fn(),
     createList: vi.fn(),
   };
   const mockGetUserProfileRecipes = vi.fn();
@@ -39,9 +38,10 @@ describe("UserProfile", () => {
   const mockGetFollowing = vi.fn();
   const mockFollowUser = vi.fn();
   const mockUnfollowUser = vi.fn();
+  const mockGetViewedUser = vi.fn();
 
-  const defaultUser = { id: 1, username: "TestUser" };
-  const viewedUser = { id: 2, username: "ViewedUser" };
+  const defaultUser = { id: "1", username: "TestUser" };
+  const viewedUser = { id: "2", username: "ViewedUser" };
 
   const defaultContext = {
     canteenApi: mockCanteenApi,
@@ -56,6 +56,9 @@ describe("UserProfile", () => {
     getFollowing: mockGetFollowing,
     followUser: mockFollowUser,
     unfollowUser: mockUnfollowUser,
+    viewedUser: viewedUser,
+    viewedUserLoading: false,
+    getViewedUser: mockGetViewedUser,
   };
 
   beforeEach(() => {
@@ -67,7 +70,7 @@ describe("UserProfile", () => {
 
     useData.mockReturnValue(defaultContext);
 
-    mockCanteenApi.fetchUser.mockResolvedValue(viewedUser);
+    mockGetViewedUser.mockResolvedValue(viewedUser);
   });
 
   const renderComponent = (userId = "2") => {
@@ -81,9 +84,14 @@ describe("UserProfile", () => {
   };
 
   it("renders loading state initially", async () => {
+    // Pass null viewedUser and loading true to simulate un-cached state
+    useData.mockReturnValue({
+      ...defaultContext,
+      viewedUser: null,
+      viewedUserLoading: true,
+    });
     renderComponent();
     expect(screen.getByText("Loading profile...")).toBeInTheDocument();
-    await waitFor(() => expect(screen.queryByText("Loading profile...")).not.toBeInTheDocument());
   });
 
   it("renders user profile data after loading", async () => {
@@ -99,13 +107,22 @@ describe("UserProfile", () => {
   });
 
   it("handles user not found", async () => {
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-    mockCanteenApi.fetchUser.mockRejectedValue(new Error("Not found"));
+    useData.mockReturnValue({
+      ...defaultContext,
+      viewedUser: null,
+      viewedUserLoading: false,
+    });
+    mockGetViewedUser.mockResolvedValue(null); // Simulate a failed fetch returning null
     renderComponent();
     await waitFor(() => {
       expect(screen.getByText("User not found.")).toBeInTheDocument();
     });
-    consoleSpy.mockRestore();
+  });
+
+  it("fetches viewedUser on mount if cache is empty or mismatched", async () => {
+    useData.mockReturnValue({ ...defaultContext, viewedUser: null });
+    renderComponent("2");
+    expect(mockGetViewedUser).toHaveBeenCalledWith("2");
   });
 
   it("fetches recipes for the user on mount but not lists", async () => {

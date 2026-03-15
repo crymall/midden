@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import RecipeDetail from "../RecipeDetail";
 import useData from "../../../context/data/useData";
@@ -51,7 +51,7 @@ vi.mock("@headlessui/react", async () => {
 });
 
 describe("RecipeDetail", () => {
-  const mockGetRecipe = vi.fn();
+  const mockGetRecipe = vi.fn().mockResolvedValue({});
   const mockToggleRecipeLike = vi.fn();
 
   const mockRecipe = {
@@ -91,6 +91,7 @@ describe("RecipeDetail", () => {
   });
 
   it("fetches recipe on mount", () => {
+    useData.mockReturnValue({ ...defaultContext, currentRecipe: null });
     render(<RecipeDetail />);
     expect(mockGetRecipe).toHaveBeenCalledWith("123");
   });
@@ -101,10 +102,13 @@ describe("RecipeDetail", () => {
     expect(screen.getByText(/Loading recipe.../i)).toBeInTheDocument();
   });
 
-  it("renders not found state", () => {
+  it("renders not found state", async () => {
     useData.mockReturnValue({ ...defaultContext, currentRecipe: null });
+    mockGetRecipe.mockResolvedValue(null);
     render(<RecipeDetail />);
-    expect(screen.getByText(/Recipe not found/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/Recipe not found/i)).toBeInTheDocument();
+    });
   });
 
   it("renders recipe details correctly", () => {

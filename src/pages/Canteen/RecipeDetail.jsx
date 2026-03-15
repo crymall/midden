@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@headlessui/react";
 import useData from "../../context/data/useData";
@@ -22,12 +22,26 @@ const RecipeDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const hasHistory = location.key !== "default";
+  const [fetchFailed, setFetchFailed] = useState(false);
+
+  const setFetchFailedEvent = useEffectEvent(() => {
+    setFetchFailed(true);
+  })
+
+  const setFetchNotFailedEvent = useEffectEvent(() => {
+    setFetchFailed(false);
+  })
 
   useEffect(() => {
     if (id) {
-      getRecipe(id);
+      if (String(currentRecipe?.id) !== String(id)) {
+        setFetchNotFailedEvent(false);
+        getRecipe(id).then((res) => {
+          if (!res) setFetchFailedEvent(true);
+        });
+      }
     }
-  }, [id, getRecipe]);
+  }, [id, currentRecipe?.id, getRecipe]);
 
   useEffect(() => {
     if (user) {
@@ -35,7 +49,7 @@ const RecipeDetail = () => {
     }
   }, [user, getUserLists]);
 
-  if (recipesLoading) {
+  if (recipesLoading || (String(currentRecipe?.id) !== String(id) && !fetchFailed)) {
     return (
       <MiddenCard>
         <div className="flex justify-center p-8">
@@ -47,7 +61,7 @@ const RecipeDetail = () => {
     );
   }
 
-  if (!currentRecipe) {
+  if (fetchFailed || !currentRecipe) {
     return (
       <MiddenCard>
         <div className="flex justify-center p-8">
