@@ -19,6 +19,7 @@ export const DataProvider = ({ children }) => {
   const [tags, setTags] = useState([]);
   const [userLists, setUserLists] = useState([]);
   const [currentListRecipes, setCurrentListRecipes] = useState([]);
+  const [currentListId, setCurrentListId] = useState(null);
   const [comboboxLists, setComboboxLists] = useState([]);
   const [comboboxListsLastFetched, setComboboxListsLastFetched] = useState(0);
   const [currentComboboxQuery, setCurrentComboboxQuery] = useState("");
@@ -168,8 +169,10 @@ export const DataProvider = ({ children }) => {
     try {
       const data = await canteenApi.fetchUserLists(userId, limit, offset, name, sort, order);
       setUserLists(data);
+      return data;
     } catch (err) {
       console.error("Fetch user lists failed", err);
+      return null;
     }
   }, []);
 
@@ -204,8 +207,13 @@ export const DataProvider = ({ children }) => {
     try {
       const data = await canteenApi.fetchListRecipes(id, limit, offset);
       setCurrentListRecipes(data);
+      setCurrentListId(id);
+      return data;
     } catch (err) {
       console.error("Fetch list recipes failed", err);
+      setCurrentListRecipes([]);
+      setCurrentListId(null);
+      return null;
     } finally {
       setRecipesLoading(false);
     }
@@ -445,6 +453,7 @@ export const DataProvider = ({ children }) => {
         comboboxListsUserId,
         hoistComboboxList,
         currentListRecipes,
+        currentListId,
         toggleRecipeLike,
         createRecipe,
         createTag,

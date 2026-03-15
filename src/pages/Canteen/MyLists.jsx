@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useEffectEvent, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@headlessui/react";
 import useData from "../../context/data/useData";
@@ -14,19 +14,34 @@ const MyLists = () => {
   const { userLists, getUserLists, canteenApi } = useData();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [creatingList, setCreatingList] = useState(false);
-  const [fetchingLists, setFetchingLists] = useState(true);
+  const [fetchingLists, setFetchingLists] = useState(userLists.length === 0);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
   const [listToDelete, setListToDelete] = useState(null);
 
+  const setFetchingListsTrueEvent = useEffectEvent(() => {
+    setFetchingLists(true);
+  });
+
+  const setFetchingListsFalseEvent = useEffectEvent(() => {
+    setFetchingLists(false);
+  });
+
+  const initialFetchRef = useRef(false);
+
   useEffect(() => {
     if (user) {
-      setFetchingLists(true);
-      getUserLists(user.id, limit, (page - 1) * limit).then(() =>
-        setFetchingLists(false),
-      );
+      if (!initialFetchRef.current && userLists.length > 0 && page === 1) {
+        setFetchingListsFalseEvent();
+      } else {
+        setFetchingListsTrueEvent();
+        getUserLists(user.id, limit, (page - 1) * limit).finally(() =>
+          setFetchingListsFalseEvent(),
+        );
+      }
+      initialFetchRef.current = true;
     }
-  }, [user, getUserLists, page, limit]);
+  }, [user, getUserLists, page, limit, userLists.length]);
 
   const handleCreateList = async (name) => {
     setCreatingList(true);

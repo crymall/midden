@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import useData from "../../context/data/useData";
 import useAuth from "../../context/auth/useAuth";
@@ -8,27 +8,59 @@ import RecipeList from "../../components/canteen/RecipeList";
 const ListView = () => {
   const { id } = useParams();
   const { user } = useAuth();
-  const { userLists, recipesLoading, getUserLists, getListRecipes, currentListRecipes } = useData();
+  const { userLists, recipesLoading, getUserLists, getListRecipes, currentListRecipes, currentListId } = useData();
   const navigate = useNavigate();
   const location = useLocation();
   const hasHistory = location.key !== "default";
 
   // Find the specific list from the cached userLists in context
-  const currentList = userLists.find((list) => list.id === id);
+  const currentList = userLists.find((list) => String(list.id) === String(id));
+
+  const [listFetchCompleted, setListFetchCompleted] = useState(!!currentList);
+  const [recipesFetchFailed, setRecipesFetchFailed] = useState(false);
+
+  const setListFetchCompletedEvent = useEffectEvent(() => {
+    setListFetchCompleted(true);
+  });
+
+  const setListFetchNotCompletedEvent = useEffectEvent(() => {
+    setListFetchCompleted(false);
+  });
+
+  const setRecipesFetchFailedEvent = useEffectEvent(() => {
+    setRecipesFetchFailed(true);
+  });
+
+  const setRecipesFetchNotFailedEvent = useEffectEvent(() => {
+    setRecipesFetchFailed(false);
+  });
 
   useEffect(() => {
-    if (user && !currentList) {
-      getUserLists(user.id);
+    if (user) {
+      if (!currentList) {
+        setListFetchNotCompletedEvent();
+        getUserLists(user.id).finally(() => setListFetchCompletedEvent());
+      } else {
+        setListFetchCompletedEvent();
+      }
     }
   }, [user, currentList, getUserLists]);
 
   useEffect(() => {
     if (id) {
-      getListRecipes(id);
+      if (String(currentListId) !== String(id)) {
+        setRecipesFetchNotFailedEvent();
+        getListRecipes(id).then((res) => {
+          if (!res) setRecipesFetchFailedEvent();
+        });
+      }
     }
-  }, [id, getListRecipes]);
+  }, [id, currentListId, getListRecipes]);
 
-  if (!currentList && !recipesLoading) {
+  const isLoading = (!listFetchCompleted) || recipesLoading || (String(currentListId) !== String(id) && !recipesFetchFailed);
+  const isNotFound = (listFetchCompleted && !currentList) || recipesFetchFailed;
+
+  if (isNotFound) {
     return (
       <MiddenCard>
         <h2 className="mb-4 font-gothic text-4xl font-bold text-white">
@@ -80,7 +112,7 @@ const ListView = () => {
 
       <RecipeList
         recipes={currentListRecipes}
-        loading={recipesLoading}
+        loading={isLoading}
       />
     </MiddenCard>
   );

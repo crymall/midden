@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import ListView from "../ListView";
@@ -35,8 +35,8 @@ vi.mock("../../../components/canteen/RecipeList", () => ({
 }));
 
 describe("ListView", () => {
-  const mockGetUserLists = vi.fn();
-  const mockGetListRecipes = vi.fn();
+  const mockGetUserLists = vi.fn().mockResolvedValue([]);
+  const mockGetListRecipes = vi.fn().mockResolvedValue([]);
   const mockUser = { id: "user123" };
 
   const defaultContext = {
@@ -45,6 +45,7 @@ describe("ListView", () => {
     getUserLists: mockGetUserLists,
     getListRecipes: mockGetListRecipes,
     currentListRecipes: [],
+    currentListId: null,
   };
 
   beforeEach(() => {
@@ -64,7 +65,7 @@ describe("ListView", () => {
     );
   };
 
-  it("fetches list recipes on mount", () => {
+  it("fetches list recipes on mount", async () => {
     useData.mockReturnValue({
       ...defaultContext,
       userLists: [{ id: "1", name: "My List" }],
@@ -74,16 +75,40 @@ describe("ListView", () => {
 
     expect(mockGetListRecipes).toHaveBeenCalledWith("1");
     expect(screen.getByText("My List")).toBeInTheDocument();
+    
+    await act(async () => {
+      await Promise.resolve();
+    });
   });
 
-  it("fetches user lists if current list is not found in context", () => {
+  it("does not fetch if list and recipes are cached", () => {
+    useData.mockReturnValue({
+      ...defaultContext,
+      userLists: [{ id: "1", name: "My List" }],
+      currentListRecipes: [{ id: 101, title: "Pasta" }],
+      currentListId: "1",
+    });
+
+    renderWithRouter("1");
+
+    expect(mockGetListRecipes).not.toHaveBeenCalled();
+    expect(mockGetUserLists).not.toHaveBeenCalled();
+    expect(screen.getByText("My List")).toBeInTheDocument();
+    expect(screen.getByText("Recipes: 1")).toBeInTheDocument();
+  });
+
+  it("fetches user lists if current list is not found in context", async () => {
     renderWithRouter("1");
 
     expect(mockGetUserLists).toHaveBeenCalledWith("user123");
     expect(mockGetListRecipes).toHaveBeenCalledWith("1");
+
+    await waitFor(() => {
+      expect(screen.getByText("List Not Found")).toBeInTheDocument();
+    });
   });
 
-  it("shows loading state when recipes are loading", () => {
+  it("shows loading state when recipes are loading", async () => {
     useData.mockReturnValue({
       ...defaultContext,
       userLists: [{ id: "1", name: "My List" }],
@@ -93,6 +118,10 @@ describe("ListView", () => {
     renderWithRouter("1");
 
     expect(screen.getByText("Loading Recipes...")).toBeInTheDocument();
+
+    await act(async () => {
+      await Promise.resolve();
+    });
   });
 
   it("renders list name and recipes when loaded", () => {
@@ -101,6 +130,7 @@ describe("ListView", () => {
       ...defaultContext,
       userLists: [{ id: "1", name: "Dinner Ideas" }],
       currentListRecipes: mockRecipes,
+      currentListId: "1",
     });
 
     renderWithRouter("1");
@@ -109,7 +139,7 @@ describe("ListView", () => {
     expect(screen.getByText("Recipes: 2")).toBeInTheDocument();
   });
 
-  it("handles list not found state correctly", () => {
+  it("handles list not found state correctly", async () => {
     useData.mockReturnValue({
       ...defaultContext,
       userLists: [{ id: "2", name: "Other List" }], // List 1 missing
@@ -118,11 +148,13 @@ describe("ListView", () => {
 
     renderWithRouter("1");
 
-    expect(screen.getByText("List Not Found")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("List Not Found")).toBeInTheDocument();
+    });
     expect(screen.getByText("The requested list could not be found.")).toBeInTheDocument();
   });
 
-  it("shows 'Loading List...' title if list is missing but recipes are loading", () => {
+  it("shows 'Loading List...' title if list is missing but recipes are loading", async () => {
     useData.mockReturnValue({
       ...defaultContext,
       userLists: [], 
@@ -132,12 +164,17 @@ describe("ListView", () => {
     renderWithRouter("1");
     
     expect(screen.getByText("Loading List...")).toBeInTheDocument();
+
+    await act(async () => {
+      await Promise.resolve();
+    });
   });
 
-  it("renders back button if history exists and navigates back", () => {
+  it("renders back button if history exists and navigates back", async () => {
     useData.mockReturnValue({
       ...defaultContext,
       userLists: [{ id: "1", name: "My List" }],
+      currentListId: "1",
     });
     renderWithRouter("1", ["/", "/lists/1"], 1);
 
@@ -145,16 +182,25 @@ describe("ListView", () => {
     expect(backBtn).toBeInTheDocument();
     fireEvent.click(backBtn);
     expect(mockNavigate).toHaveBeenCalledWith(-1);
+
+    await act(async () => {
+      await Promise.resolve();
+    });
   });
 
-  it("renders static link if no history exists", () => {
+  it("renders static link if no history exists", async () => {
     useData.mockReturnValue({
       ...defaultContext,
       userLists: [{ id: "1", name: "My List" }],
+      currentListId: "1",
     });
     renderWithRouter("1", ["/lists/1"], 0);
 
     expect(screen.queryByRole("button", { name: "Go back" })).not.toBeInTheDocument();
     expect(screen.getByText("← Back to My Lists")).toBeInTheDocument();
+
+    await act(async () => {
+      await Promise.resolve();
+    });
   });
 });

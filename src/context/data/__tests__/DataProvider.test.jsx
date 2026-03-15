@@ -347,11 +347,13 @@ describe("DataProvider", () => {
       const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
       const { result } = renderHook(() => useContext(DataContext), { wrapper });
 
+      let data;
       await act(async () => {
-        await result.current.getUserLists("u1", 20, 0, "", "created_at", "DESC");
+        data = await result.current.getUserLists("u1", 20, 0, "", "created_at", "DESC");
       });
 
       expect(result.current.userLists).toEqual(mockLists);
+      expect(data).toEqual(mockLists);
       expect(canteenApi.fetchUserLists).toHaveBeenCalledWith("u1", 20, 0, "", "created_at", "DESC");
     });
 
@@ -409,11 +411,14 @@ describe("DataProvider", () => {
       const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
       const { result } = renderHook(() => useContext(DataContext), { wrapper });
 
+      let data;
       await act(async () => {
-        await result.current.getListRecipes(1, 10, 0);
+        data = await result.current.getListRecipes(1, 10, 0);
       });
 
       expect(result.current.currentListRecipes).toEqual(mockListRecipes);
+      expect(result.current.currentListId).toBe(1);
+      expect(data).toEqual(mockListRecipes);
       expect(result.current.recipesLoading).toBe(false);
     });
 

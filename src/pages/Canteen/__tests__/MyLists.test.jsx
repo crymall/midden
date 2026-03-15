@@ -51,6 +51,32 @@ describe("MyLists", () => {
     expect(screen.getByText("Weekly")).toBeInTheDocument();
   });
 
+  it("does not fetch lists on mount if cache exists", async () => {
+    render(
+      <MemoryRouter>
+        <MyLists />
+      </MemoryRouter>
+    );
+    await waitFor(() => expect(screen.getByText("Favorites")).toBeInTheDocument());
+    expect(mockGetUserLists).not.toHaveBeenCalled();
+  });
+
+  it("fetches lists on mount if cache is empty", async () => {
+    useData.mockReturnValue({
+      userLists: [],
+      getUserLists: mockGetUserLists.mockResolvedValue([]),
+      canteenApi: mockCanteenApi,
+    });
+    render(
+      <MemoryRouter>
+        <MyLists />
+      </MemoryRouter>
+    );
+    await waitFor(() => {
+      expect(mockGetUserLists).toHaveBeenCalledWith("user1", 20, 0);
+    });
+  });
+
   it("opens delete modal and deletes list", async () => {
     render(
       <MemoryRouter>
