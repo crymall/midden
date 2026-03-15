@@ -118,6 +118,36 @@ describe("DataProvider", () => {
     expect(result.current.users.find((u) => u.id === "1").role).toBe("ADMIN");
   });
 
+  it("handles deleteUser error gracefully", async () => {
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    iamApi.deleteUser.mockRejectedValue(new Error("Delete failed"));
+    
+    const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+    const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+    await act(async () => {
+      await result.current.deleteUser("1");
+    });
+
+    expect(consoleSpy).toHaveBeenCalledWith("Delete user failed", expect.any(Error));
+    consoleSpy.mockRestore();
+  });
+
+  it("handles updateUserRole error gracefully", async () => {
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    iamApi.updateUserRole.mockRejectedValue(new Error("Update failed"));
+    
+    const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+    const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+    await act(async () => {
+      await result.current.updateUserRole("1", "role_admin_id");
+    });
+
+    expect(consoleSpy).toHaveBeenCalledWith("Update user role failed", expect.any(Error));
+    consoleSpy.mockRestore();
+  });
+
   describe("Canteen Actions", () => {
     it("fetches recipes and updates state", async () => {
       const mockRecipes = [{ id: 1, title: "Soup" }];
@@ -262,6 +292,194 @@ describe("DataProvider", () => {
 
       expect(canteenApi.createIngredient).toHaveBeenCalledWith("Saffron");
       expect(result.current.ingredients[0]).toEqual(newIngredient);
+    });
+
+    it("fetches popular recipes and updates state", async () => {
+      const mockRecipes = [{ id: 1, title: "Pop Soup" }];
+      canteenApi.fetchPopularRecipes.mockResolvedValue(mockRecipes);
+
+      const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+      const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+      await act(async () => {
+        await result.current.getPopularRecipes(10, 0);
+      });
+
+      expect(result.current.recipesLoading).toBe(false);
+      expect(result.current.recipes).toEqual(mockRecipes);
+      expect(canteenApi.fetchPopularRecipes).toHaveBeenCalledWith(10, 0);
+    });
+
+    it("clears ingredients", async () => {
+      const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+      const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+      act(() => {
+        result.current.clearIngredients();
+      });
+
+      expect(result.current.ingredients).toEqual([]);
+    });
+
+    it("fetches user lists and updates state", async () => {
+      const mockLists = [{ id: 1, name: "Favorites" }];
+      canteenApi.fetchUserLists.mockResolvedValue(mockLists);
+
+      const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+      const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+      await act(async () => {
+        await result.current.getUserLists("u1", 20, 0, "", "created_at", "DESC");
+      });
+
+      expect(result.current.userLists).toEqual(mockLists);
+      expect(canteenApi.fetchUserLists).toHaveBeenCalledWith("u1", 20, 0, "", "created_at", "DESC");
+    });
+
+    it("fetches combobox lists, updates state, and hoists a list", async () => {
+      const mockLists = [
+        { id: 1, name: "List 1" },
+        { id: 2, name: "List 2" },
+        { id: 3, name: "List 3" },
+      ];
+      canteenApi.fetchUserLists.mockResolvedValue(mockLists);
+
+      const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+      const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+      // Without query
+      await act(async () => {
+        await result.current.getComboboxLists("u1", "");
+      });
+
+      expect(result.current.comboboxLists).toEqual(mockLists);
+      expect(result.current.comboboxListsUserId).toBe("u1");
+      expect(result.current.currentComboboxQuery).toBe("");
+      expect(result.current.comboboxListsLastFetched).toBeGreaterThan(0);
+
+      // Hoist list 3
+      act(() => {
+        result.current.hoistComboboxList(3);
+      });
+      
+      expect(result.current.comboboxLists[0].id).toBe(3);
+
+      // Hoist non-existent list
+      act(() => {
+        result.current.hoistComboboxList(99);
+      });
+      expect(result.current.comboboxLists[0].id).toBe(3); // Unchanged
+
+      // Hoist index 0 (now list 3 is at index 0)
+      act(() => {
+        result.current.hoistComboboxList(3);
+      });
+      expect(result.current.comboboxLists[0].id).toBe(3); // Unchanged
+
+      // With query
+      await act(async () => {
+        await result.current.getComboboxLists("u1", "test");
+      });
+      expect(result.current.currentComboboxQuery).toBe("test");
+    });
+
+    it("fetches list recipes and updates state", async () => {
+      const mockListRecipes = [{ id: 1, title: "List Recipe" }];
+      canteenApi.fetchListRecipes.mockResolvedValue(mockListRecipes);
+
+      const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+      const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+      await act(async () => {
+        await result.current.getListRecipes(1, 10, 0);
+      });
+
+      expect(result.current.currentListRecipes).toEqual(mockListRecipes);
+      expect(result.current.recipesLoading).toBe(false);
+    });
+
+    it("creates a recipe", async () => {
+      const mockRecipe = { id: 1, title: "New Recipe" };
+      canteenApi.createRecipe.mockResolvedValue(mockRecipe);
+
+      const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+      const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+      let createdRecipe;
+      await act(async () => {
+        createdRecipe = await result.current.createRecipe({ title: "New Recipe" });
+      });
+
+      expect(canteenApi.createRecipe).toHaveBeenCalledWith({ title: "New Recipe" });
+      expect(createdRecipe).toEqual(mockRecipe);
+    });
+
+    describe("Error handling in Canteen Actions", () => {
+      let consoleSpy;
+      beforeEach(() => {
+        consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      });
+      afterEach(() => {
+        consoleSpy.mockRestore();
+      });
+
+      it("handles errors across various endpoints gracefully", async () => {
+        const error = new Error("Failed");
+        canteenApi.fetchRecipes.mockRejectedValue(error);
+        canteenApi.fetchUserRecipes.mockRejectedValue(error);
+        canteenApi.fetchPopularRecipes.mockRejectedValue(error);
+        canteenApi.fetchRecipe.mockRejectedValue(error);
+        canteenApi.fetchIngredients.mockRejectedValue(error);
+        canteenApi.fetchTags.mockRejectedValue(error);
+        canteenApi.fetchUserLists.mockRejectedValue(error);
+        canteenApi.fetchListRecipes.mockRejectedValue(error);
+        canteenApi.unlikeRecipe.mockRejectedValue(error);
+        canteenApi.likeRecipe.mockRejectedValue(error);
+        canteenApi.createTag.mockRejectedValue(error);
+        canteenApi.createIngredient.mockRejectedValue(error);
+
+        const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+        const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+        await act(async () => { await result.current.getRecipes(); });
+        expect(consoleSpy).toHaveBeenCalledWith("Fetch recipes failed", error);
+
+        await act(async () => { await result.current.getUserProfileRecipes("u1"); });
+        expect(consoleSpy).toHaveBeenCalledWith("Fetch user recipes failed", error);
+
+        await act(async () => { await result.current.getPopularRecipes(); });
+        expect(consoleSpy).toHaveBeenCalledWith("Fetch popular recipes failed", error);
+
+        await act(async () => { await result.current.getRecipe("1"); });
+        expect(consoleSpy).toHaveBeenCalledWith("Fetch recipe failed", error);
+
+        await act(async () => { await result.current.getIngredients(); });
+        expect(consoleSpy).toHaveBeenCalledWith("Fetch ingredients failed", error);
+
+        await act(async () => { await result.current.getTags(); });
+        expect(consoleSpy).toHaveBeenCalledWith("Fetch tags failed", error);
+
+        await act(async () => { await result.current.getUserLists("u1"); });
+        expect(consoleSpy).toHaveBeenCalledWith("Fetch user lists failed", error);
+
+        await act(async () => { await result.current.getComboboxLists("u1"); });
+        expect(consoleSpy).toHaveBeenCalledWith("Fetch combobox lists failed", error);
+
+        await act(async () => { await result.current.getListRecipes(1, 10, 0); });
+        expect(consoleSpy).toHaveBeenCalledWith("Fetch list recipes failed", error);
+
+        await act(async () => { await result.current.toggleRecipeLike("1", true); });
+        expect(consoleSpy).toHaveBeenCalledWith("Toggle like failed", error);
+
+        await act(async () => { await result.current.toggleRecipeLike("1", false); });
+        expect(consoleSpy).toHaveBeenCalledWith("Toggle like failed", error);
+
+        await expect(result.current.createTag("NewTag")).rejects.toThrow();
+        expect(consoleSpy).toHaveBeenCalledWith("Create tag failed", error);
+
+        await expect(result.current.createIngredient("NewIng")).rejects.toThrow();
+        expect(consoleSpy).toHaveBeenCalledWith("Create ingredient failed", error);
+      });
     });
   });
 
@@ -451,19 +669,26 @@ describe("DataProvider", () => {
       });
     });
 
-    it("marks messages as read and updates state", async () => {
+    it("marks messages as read and updates state and threads", async () => {
       const initialConversation = [
-        { id: 1, content: "Msg 1", is_read: false },
-        { id: 2, content: "Msg 2", is_read: false },
+        { id: 1, sender_id: "u3", content: "Msg 1", is_read: false },
+        { id: 2, sender_id: "u4", content: "Msg 2", is_read: false },
       ];
+      const initialThreads = [
+        { id: 10, other_user_id: "u3", is_read: false },
+        { id: 11, other_user_id: "u4", is_read: false }
+      ];
+
       canteenApi.fetchConversation.mockResolvedValue(initialConversation);
+      canteenApi.fetchThreads.mockResolvedValue(initialThreads);
       canteenApi.markMessagesAsRead.mockResolvedValue({});
 
       const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
       const { result } = renderHook(() => useContext(DataContext), { wrapper });
 
       await act(async () => {
-        await result.current.getConversation("u2", 20, 0);
+        await result.current.getConversation("u3", 20, 0);
+        await result.current.getThreads(20, 0);
       });
 
       await act(async () => {
@@ -473,6 +698,80 @@ describe("DataProvider", () => {
       expect(canteenApi.markMessagesAsRead).toHaveBeenCalledWith([1]);
       expect(result.current.currentConversation.find((m) => m.id === 1).is_read).toBe(true);
       expect(result.current.currentConversation.find((m) => m.id === 2).is_read).toBe(false);
+      expect(result.current.threads.find((t) => t.other_user_id === "u3").is_read).toBe(true);
+      expect(result.current.threads.find((t) => t.other_user_id === "u4").is_read).toBe(false);
+    });
+
+    it("sends message with recipe but fails to fetch recipe details", async () => {
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      const newMessage = { id: 3, content: "New recipe message", recipe_id: "102" };
+
+      canteenApi.sendMessage.mockResolvedValue(newMessage);
+      canteenApi.fetchRecipe.mockRejectedValue(new Error("Failed"));
+
+      const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+      const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+      await act(async () => {
+        await result.current.sendMessage("u2", "New recipe message", "102");
+      });
+
+      expect(consoleSpy).toHaveBeenCalledWith("Failed to fetch recipe for new message", expect.any(Error));
+      expect(result.current.currentConversation).toContainEqual(newMessage);
+      consoleSpy.mockRestore();
+    });
+
+    describe("Error handling in Relationships & Messages", () => {
+      let consoleSpy;
+      beforeEach(() => {
+        consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      });
+      afterEach(() => {
+        consoleSpy.mockRestore();
+      });
+
+      it("handles errors across various endpoints gracefully", async () => {
+        const error = new Error("Failed");
+        canteenApi.fetchFollowers.mockRejectedValue(error);
+        canteenApi.fetchFollowing.mockRejectedValue(error);
+        canteenApi.fetchFriends.mockRejectedValue(error);
+        canteenApi.followUser.mockRejectedValue(error);
+        canteenApi.unfollowUser.mockRejectedValue(error);
+        canteenApi.fetchThreads.mockRejectedValue(error);
+        canteenApi.fetchConversation.mockRejectedValue(error);
+        canteenApi.sendMessage.mockRejectedValue(error);
+        canteenApi.markMessagesAsRead.mockRejectedValue(error);
+
+        const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+        const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+        await act(async () => { await result.current.getFollowers("1"); });
+        expect(consoleSpy).toHaveBeenCalledWith("Fetch followers failed", error);
+
+        await act(async () => { await result.current.getFollowing("1"); });
+        expect(consoleSpy).toHaveBeenCalledWith("Fetch following failed", error);
+
+        await act(async () => { await result.current.getFriends("1"); });
+        expect(consoleSpy).toHaveBeenCalledWith("Fetch friends failed", error);
+
+        await act(async () => { await result.current.followUser("1"); });
+        expect(consoleSpy).toHaveBeenCalledWith("Follow user failed", error);
+
+        await act(async () => { await result.current.unfollowUser("1"); });
+        expect(consoleSpy).toHaveBeenCalledWith("Unfollow user failed", error);
+
+        await act(async () => { await result.current.getThreads(); });
+        expect(consoleSpy).toHaveBeenCalledWith("Fetch threads failed", error);
+
+        await act(async () => { await result.current.getConversation("1"); });
+        expect(consoleSpy).toHaveBeenCalledWith("Fetch conversation failed", error);
+
+        await expect(result.current.sendMessage("1", "hi")).rejects.toThrow();
+        expect(consoleSpy).toHaveBeenCalledWith("Send message failed", error);
+
+        await act(async () => { await result.current.markMessagesAsRead([1]); });
+        expect(consoleSpy).toHaveBeenCalledWith("Mark messages read failed", error);
+      });
     });
   });
 });
